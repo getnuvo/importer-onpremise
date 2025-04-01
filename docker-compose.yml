@@ -1,0 +1,31 @@
+version: '3'
+services:
+  management:
+    container_name: sdk-management
+    image: getnuvo/importer:latest
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./sdk-management.docker.env
+    links:
+      - mongo
+      - mapping-module
+
+  mapping-module:
+    platform: linux/x86_64
+    image: 142674448920.dkr.ecr.eu-central-1.amazonaws.com/nuvo-mapping-module:staging
+    env_file:
+      - ./mapping-module.docker.env
+    ports:
+      - '8000:8000'
+
+  mongo:
+    container_name: my-mongo-db
+    image: mongo:latest
+    volumes:
+      - ./db_backup:/data/db
+    ports:
+      - '27018:27017'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=importer
+      - MONGO_INITDB_ROOT_PASSWORD=importer
