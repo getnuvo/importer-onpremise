@@ -92,7 +92,7 @@ You can access the Kong Admin GUI by visiting: http://localhost:8002
 **APIs**
 
 - Base Endpoint: http://localhost:8000
-- Health Check - Importer Module: `/sdk/v1/auth/health`
+- Health Check - Importer Module: `/sdk/v1/management/health`
 - Health Check - Mapping Module: `/sdk/mapping/health`
 
 ## Helm Chart Setup (Coming Soon)
