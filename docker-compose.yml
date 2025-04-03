@@ -67,7 +67,6 @@ services:
       - kong-network
 
   importer-module:
-    platform: linux/x86_64
     container_name: importer-module
     image: getnuvo/importer:latest
     ports:
@@ -79,17 +78,10 @@ services:
       - mapping-module
     networks:
       - kong-network
-    # healthcheck:
-    #   test:
-    #     ["CMD", "curl", "-f", "http://localhost:3000/sdk/v1/management/health"]
-    #   interval: 10s
-    #   retries: 5
-    #   timeout: 5s
 
   mapping-module:
-    platform: linux/x86_64
     container_name: mapping-module
-    image: 142674448920.dkr.ecr.eu-central-1.amazonaws.com/nuvo-mapping-module:staging
+    image: getnuvo/mapping:latest
     env_file:
       - ./mapping-module.docker.env
     ports:
