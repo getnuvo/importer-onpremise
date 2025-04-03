@@ -1,4 +1,4 @@
-version: "3"
+version: "3.4"
 
 networks:
   kong-network:
@@ -27,9 +27,12 @@ services:
 
   kong-migrations:
     image: kong
+    container_name: kong-migrations
     depends_on:
-      - kong-database
-    command: kong migrations bootstrap
+      kong-database:
+        condition: service_healthy
+    command: >
+      sh -c "sleep 10 && kong migrations bootstrap"
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
@@ -78,7 +81,7 @@ services:
       - kong-network
     # healthcheck:
     #   test:
-    #     ["CMD", "curl", "-f", "http://localhost:3000/sdk/v1/auth/health"]
+    #     ["CMD", "curl", "-f", "http://localhost:3000/sdk/v1/management/health"]
     #   interval: 10s
     #   retries: 5
     #   timeout: 5s
