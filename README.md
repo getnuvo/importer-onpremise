@@ -139,7 +139,7 @@ kubectl create secret docker-registry -n ingress-nginx my-dockerhub-secret \
 
 - Install services
 
-**** Before you run the `mapping-module` please recheck your environment keys here `mapping-chart/mapping-module-docker-env-configmap.yaml`.
+Before you run the `mapping-module` please recheck your environment keys here `mapping-chart/mapping-module-docker-env-configmap.yaml`.
 
 ```bash
 helm install importer ./helm-chart/importer-chart -n ingress-nginx
@@ -162,7 +162,7 @@ mapping;
 mongo;
 ```
 
-\*\* If there have any image has failed to run you can use the command to debug it.
+If there have any image has failed to run you can use the command to debug it.
 
 ```bash
 kubectl describe pod {pod_name eg.importer-module-xxxx} -n ingress-nginx
@@ -176,16 +176,14 @@ kubectl apply -f ./helm-chart/ingress.yaml -n ingress-nginx
 
 - Fowarding port (you can change running port 8080 to any you want).
 
-```
+```bash
 kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8080:80
 ```
 
 - Finally you service is running at.
 
-Importer `http://localhost:8080/importer-module/`
-Mapping `http://localhost:8080/mapping-module/`
-
-\*\*
+  - Importer `http://localhost:8080/importer-module/`
+  - Mapping `http://localhost:8080/mapping-module/`
 
 ## Conclusion
 
