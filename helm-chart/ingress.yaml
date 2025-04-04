@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: example-ingress 
+  name: example-ingress
   namespace: ingress-nginx
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
@@ -9,17 +9,17 @@ spec:
   rules:
     - http:
         paths:
-          - path: /importer-module/(.*) 
+          - path: /sdk/mapping/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mapping-module
+                port:
+                  number: 8000
+          - path: /(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: importer-module
                 port:
                   number: 3000
-          - path: /mapping-module/(.*) 
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: mapping-module 
-                port:
-                  number: 8000
