@@ -50,7 +50,7 @@ prepare_nuvo_images() {
     echo "Preparing nuvo images..."
 
     docker pull getnuvo/importer:latest
-    docker pull getnuvo/mapping-module:latest
+    docker pull getnuvo/mapping:latest
 
     echo "nuvo images prepared successfully!"
 }
