@@ -9,8 +9,8 @@ metadata:
   name: mapping-module
 spec:
   ports:
-    - name: '8000'
-      port: 8000
-      targetPort: 8000
+    - name: '3001'
+      port: 3001
+      targetPort: 3001
   selector:
     io.kompose.service: mapping-module

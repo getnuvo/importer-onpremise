@@ -101,7 +101,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           name: mapping-module
           ports:
-            - containerPort: 8000
+            - containerPort: 3001
               protocol: TCP
       restartPolicy: Always
       imagePullSecrets:
