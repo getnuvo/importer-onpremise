@@ -180,10 +180,7 @@ kubectl apply -f ./helm-chart/ingress.yaml -n ingress-nginx
 kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8080:80
 ```
 
-- Finally you service is running at.
-
-  - Importer `http://localhost:8080/importer-module/`
-  - Mapping `http://localhost:8080/mapping-module/`
+- Finally you service is running at `http://localhost:8080`.
 
 ## Conclusion
 
