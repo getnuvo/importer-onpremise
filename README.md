@@ -19,7 +19,7 @@ This script:
 - Configures the system to allow running Docker without sudo
 - Pulls nuvo images (requires appropriate permissions)
 
-## Setting up LocalStack
+## Setting up LocalStack via Docker Compose
 
 LocalStack simulates AWS services locally. To start LocalStack using Docker Compose:
 
@@ -95,41 +95,42 @@ You can access the Kong Admin GUI by visiting: http://localhost:8002
 - Health Check - Importer Module: `/sdk/v1/management/health`
 - Health Check - Mapping Module: `/sdk/mapping/health`
 
-## Helm Chart Setup
+## Setting up LocalStack via Helm Chart
 
-We are setting up a Helm chart to simplify local deployment and testing. This setup allows you to deploy services efficiently using Kubernetes and Helm.
+This guide will help you set up and deploy services locally using Helm charts on Kubernetes with Minikube. It simplifies the process of testing and managing your services.
 
-### Develop purpose
+### Prerequisites
 
-#### Environment
+Ensure the following tools are installed and configured:
 
 - Docker
-- Kubernates v1.31.4
+- Kubernetes (v1.31.4 or later)
 - Minikube
 - Helm
 
-#### Preparation
+### Setup Process
 
-We assume that you've already run `Docker`, `Kubernates with docker driven` then do follow these step.
+1. Start Minikube
 
-- Start minikube server.
+First, start the Minikube server to set up the Kubernetes cluster:
 
 ```bash
 minikube start
 ```
 
-- Enable addons to using Nginx.
+2. Enable NGINX Ingress Addon
+
+Enable the NGINX ingress addon in Minikube. This will create a new namespace ingress-nginx and deploy the NGINX ingress controller.
 
 ```bash
 minikube addons enable ingress
 ```
 
-The command will create new namespace call `ingress-nginx` and add Nginx service in.
+3. Login to Docker Registry
 
-- Before install the service we need to login to `Docker registry hub` for `Kubernates`.
+Before installing services, log in to the Docker registry. Replace `{username}` and `{password}` with your Docker Hub credentials.
 
 ```bash
-# using dockerhub credential that generated from Nuvo
 kubectl create secret docker-registry -n ingress-nginx my-dockerhub-secret \
   --docker-server=https://index.docker.io/v1/ \
   --docker-username={username} \
@@ -137,9 +138,17 @@ kubectl create secret docker-registry -n ingress-nginx my-dockerhub-secret \
   --docker-email=-
 ```
 
-- Install services
+4. Install the Services
 
-Before you run the `mapping-module` please recheck your environment keys here `mapping-chart/mapping-module-docker-env-configmap.yaml`.
+1. Install nginx-ingress
+
+```bash
+helm install nginx-ingress ./helm-chart/nginx-ingress-chart
+```
+
+2. Install Importer and Mapping Services
+
+After the ingress controller is set up, you can install the services:
 
 ```bash
 helm install importer ./helm-chart/importer-chart -n ingress-nginx
@@ -147,41 +156,56 @@ helm install importer ./helm-chart/importer-chart -n ingress-nginx
 helm install mapping ./helm-chart/mapping-chart -n ingress-nginx
 ```
 
-- Check service status
+5. Check the Service Status
+
+After installing, verify that all the pods are running. You should see the following services in `Running` status:
 
 ```bash
  kubectl get pod -n ingress-nginx
 ```
 
-And see the list these 4 should in `running` status.
+The expected services are:
 
-```js
-ingress - nginx - controller;
-importer - module;
-mapping;
-mongo;
-```
+1. `ingress-nginx-controller`
+2. `importer-module`
+3. `mapping-module`
+4. `mongo`
 
-If there have any image has failed to run you can use the command to debug it.
+If any pod fails to start, you can troubleshoot using:
 
 ```bash
-kubectl describe pod {pod_name eg.importer-module-xxxx} -n ingress-nginx
+kubectl describe pod <pod_name> -n ingress-nginx
 ```
 
-- Apply ingress file by add route rules.
+6. Port Forwarding
 
-```js
-kubectl apply -f ./helm-chart/ingress.yaml -n ingress-nginx
-```
+To access the services locally, you have two options:
 
-- Fowarding port (you can change running port 8080 to any you want).
+**Option 1: Using** kubectl port-forward
+
+You can forward the port to access the services locally. You can change 8000 to any port you prefer:
 
 ```bash
-kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8080:80
+kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8000:80
 ```
 
-- Finally you service is running at `http://localhost:8080`.
+Once the port is forwarded, you can access the services via http://localhost:8000.
+
+**Option 2: Using** minikube tunnel (Recommended)
+
+Alternatively, you can use minikube tunnel to create routes to your services in the Minikube cluster. This method doesn't require manually forwarding individual ports:
+
+1. Start the minikube tunnel:
+
+```bash
+minikube tunnel
+```
+
+2. After running the tunnel, your services will be accessible through localhost without the need to specify ports for each service.
+
+The nginx-ingress-controller will be available at http://localhost:80.
+You can access your services through their defined paths (e.g., http://localhost/sdk/v1/...).
 
 ## Conclusion
 
-This repository helps you set up a local development environment using LocalStack, Docker, and Kong API Gateway. Follow the steps above to install necessary tools, start LocalStack, and configure Kong for service routing.
+This repository provides comprehensive instructions for setting up a local development environment using both Docker Compose and Kubernetes. For services running with Docker Compose, Kong is used as the API Gateway to manage and route traffic. For Kubernetes-based deployments, Helm charts and the NGINX Ingress Controller are used for service management and routing.

@@ -1,5 +1,5 @@
 name: helm-chart
-description: A generated Helm Chart for helm-chart from Skippbox Kompose
+description: A generated Helm Chart for importer-module-chart from Skippbox Kompose
 version: 0.0.1
 apiVersion: v2
 keywords:
