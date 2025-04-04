@@ -99,5 +99,10 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=nuvo
       - MONGO_INITDB_ROOT_PASSWORD=nuvo
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
     networks:
       - kong-network

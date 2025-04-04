@@ -1,0 +1,4 @@
+image:
+  repository: getnuvo/mapping
+  tag: latest
+  pullPolicy: IfNotPresent
