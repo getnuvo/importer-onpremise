@@ -22,3 +22,10 @@ curl -i -X POST --url http://localhost:8001/services/mapping-service/routes \
   --data 'paths[]=/sdk/mapping' \
   --data 'strip_path=true'
 
+# enable cors plugin for mapping service
+curl -i -X POST --url http://localhost:8001/services/mapping-service/plugins/ \
+  --data 'name=cors'
+
+# enable cors plugin for importer service
+curl -i -X POST --url http://localhost:8001/services/importer-service/plugins/ \
+   --data 'name=cors'

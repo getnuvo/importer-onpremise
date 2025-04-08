@@ -60,6 +60,8 @@ services:
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
       KONG_PORTAL_GUI_HOST: http://localhost:8002
     ports:
+      # if you want host port you can set it 80:8000
+      # if you want SSL port you can add - "433:8443"
       - "8000:8000"
       - "8001:8001"
       - "8002:8002"
