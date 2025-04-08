@@ -2,7 +2,7 @@
 
 ## Overview
 
-The nuvo-onpremise repository provides scripts and configurations to set up LocalStack for testing with `docker-compose.yml` and an install.sh script to install Docker and Docker Compose tools. Additionally, this guide includes steps to create services and routes via Kong API.
+The `nuvo-onpremise` repository provides scripts and configurations for setting up a local development environment using either Docker Compose or Kubernetes. It supports LocalStack, Kong API Gateway (for Docker Compose), and Helm charts with NGINX Ingress Controller (for Kubernetes) to manage service routing and network proxying.
 
 ## Installation
 
