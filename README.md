@@ -41,47 +41,33 @@ To stop the services:
 docker-compose down
 ```
 
+## Updating the Services
+
+To update your local environment with the latest images and clean up unused resources, use the provided update script:
+
+```bash
+./scripts/update_nuvo.sh
+```
+
+This script will:
+
+- Pull the latest images from Docker Hub
+- Recreate the containers using Docker Compose
+- Prune unused Docker images and containers
+- Display the current status of running containers
+
 ## Creating a Service and Route via Kong API
 
-Kong API Gateway allows you to manage microservices efficiently. Below are steps to set up a service and route:
-
-1. Add a New Service
-
-For the **Importer Module** Service:
+To set up the services and routes for the `importer-module` and `mapping-module`, simply execute the following script **after starting the Docker Compose services**:
 
 ```bash
-curl -i -X POST --url http://localhost:8001/services/ \
-  --data 'name=importer-service' \
-  --data 'url=http://importer-module:3000'
+./scripts/configure_routes.sh
 ```
 
-For the **Mapping Module** Service:
+> [!NOTE]
+> Ensure that Docker Compose is up and running before executing this script, as it depends on the Kong Admin API being available.
 
-```bash
-curl -i -X POST --url http://localhost:8001/services/ \
-  --data 'name=mapping-service' \
-  --data 'url=http://mapping-module:8000'
-```
-
-2. Add Routes to the Services
-
-For the **Importer Module** Service:
-
-```bash
-curl -i -X POST --url http://localhost:8001/services/importer-service/routes \
-  --data 'name=importer-route' \
-  --data 'paths[]=/sdk/v1' \
-  --data 'strip_path=false'
-```
-
-For the **Mapping Module** Service:
-
-```bash
-curl -i -X POST --url http://localhost:8001/services/mapping-service/routes \
-  --data 'name=mapping-route' \
-  --data 'paths[]=/sdk/mapping' \
-  --data 'strip_path=true'
-```
+This script uses the Kong Admin API to create and configure the necessary services and their corresponding routes.
 
 ## Access Points
 
@@ -92,7 +78,7 @@ You can access the Kong Admin GUI by visiting: http://localhost:8002
 **APIs**
 
 - Base Endpoint: http://localhost:8000
-- Health Check - Importer Module: `/sdk/v1/management/health`
+- Health Check - Importer Module: `/sdk/v1/health`
 - Health Check - Mapping Module: `/sdk/mapping/health`
 
 ## Setting up LocalStack via Helm Chart

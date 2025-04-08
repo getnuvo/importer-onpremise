@@ -29,7 +29,7 @@ spec:
             - name: MONGO_INITDB_ROOT_USERNAME
               value: nuvo
           image: '{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}'
-          name: my-mongo-db
+          name: nuvo-database
           ports:
             - containerPort: 27017
               protocol: TCP

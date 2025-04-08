@@ -85,12 +85,12 @@ services:
     env_file:
       - ./mapping-module.docker.env
     ports:
-      - "3001:8000"
+      - "3001:3001"
     networks:
       - kong-network
 
   mongo:
-    container_name: my-mongo-db
+    container_name: nuvo-database
     image: mongo:latest
     volumes:
       - ./db_backup:/data/db
