@@ -2,7 +2,7 @@
 
 ## Overview
 
-The nuvo-onpremise repository provides scripts and configurations to set up LocalStack for testing with docker-compose.yaml and an install.sh script to install Docker and Docker Compose tools. Additionally, this guide includes steps to create services and routes via Kong API.
+The nuvo-onpremise repository provides scripts and configurations to set up LocalStack for testing with `docker-compose.yml` and an install.sh script to install Docker and Docker Compose tools. Additionally, this guide includes steps to create services and routes via Kong API.
 
 ## Installation
 
@@ -27,7 +27,7 @@ LocalStack simulates AWS services locally. To start LocalStack using Docker Comp
 docker-compose up -d
 ```
 
-This will spin up all services defined in docker-compose.yaml.
+This will spin up all services defined in `docker-compose.yml`.
 
 To check running containers:
 
