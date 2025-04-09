@@ -46,6 +46,11 @@ This script will:
 - Allow Docker to run without sudo
 - Pull the required nuvo backend images (requires proper access)
 
+## 🎬 Start Docker Service
+
+```bash
+docker-compose up -d
+```
 
 ## 🔁 Configure Routing
 
