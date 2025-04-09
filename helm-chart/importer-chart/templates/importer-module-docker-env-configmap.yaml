@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  IMPORTER_DB_HOST: mongodb://mongo.ingress-nginx.svc.cluster.local:27018
+  IMPORTER_DB_HOST: mongodb://mongo.nginx-gateway.svc.cluster.local:27018
   IMPORTER_DB_NAME: nuvo
   IMPORTER_DB_PASSWORD: nuvo
   IMPORTER_DB_USERNAME: nuvo
