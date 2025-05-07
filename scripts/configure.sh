@@ -9,6 +9,35 @@ ALIAS_NAME="local"
 MINIO_DEFAULT_USERNAME="minioadmin"
 MINIO_DEFAULT_PASSWORD="minioadmin"
 NC='\033[0m'
+LOCAL_IP=0.0.0.0
+
+#!/bin/bash
+
+get_ip() {
+    local ip
+    case "$(uname -s)" in
+        Darwin)
+            ip=$(ipconfig getifaddr en0)
+            if [ -z "$ip" ]; then
+                ip=$(ipconfig getifaddr en1)
+            fi
+            ;;
+
+        Linux)
+            ip=$(hostname -I | awk '{print $1}')
+            ;;
+
+        MINGW*|MSYS*|CYGWIN*)
+            ip=$(ipconfig | grep -E "IPv4 Address|IPv4-adresse" | awk -F: '{print $2}' | sed 's/^[ \t]*//')
+            ;;
+        *)
+            echo "Unsupported OS"
+            exit 1
+            ;;
+    esac
+
+    LOCAL_IP="$ip"
+}
 
 setup_route () {
 # create importer-service
@@ -34,6 +63,17 @@ curl -i -X POST --url http://localhost:8001/services/mapping-service/routes \
   --data 'strip_path=true'
 }
 
+checkup_environment_file () {
+    echo -e "${BOLD}Fixing Env file..."
+    ENV_FILE="importer-module.docker.env"
+    EXAMPLE_ENV_FILE="example.${ENV_FILE}"
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "File $ENV_FILE does not exist."
+        cp $EXAMPLE_ENV_FILE $ENV_FILE
+    fi
+    echo -e "${BOLD}Done"
+}
+
 replace_environment_file () {
     filename="temp.txt"
 
@@ -55,17 +95,25 @@ replace_environment_file () {
     EXAMPLE_ENV_FILE="example.${ENV_FILE}"
     if [ -f "$ENV_FILE" ]; then
         cp importer-module.docker.env tmp.env
-        sed "s/IMPORTER_AWS_ACCESS_KEY=.*$/IMPORTER_AWS_ACCESS_KEY=${keys[0]}/;s/IMPORTER_AWS_SECRET_KEY=.*$/IMPORTER_AWS_SECRET_KEY=${keys[1]}/g" tmp.env > $ENV_FILE  
+        sed "s|IMPORTER_AWS_ENDPOINT=.*$|IMPORTER_AWS_ENDPOINT=http://${LOCAL_IP}:9000|; \
+             s|IMPORTER_AWS_ACCESS_KEY=.*$|IMPORTER_AWS_ACCESS_KEY=${keys[0]}|; \
+             s|IMPORTER_AWS_SECRET_KEY=.*$|IMPORTER_AWS_SECRET_KEY=${keys[1]}|" \
+             tmp.env > "$ENV_FILE"
         rm tmp.env
-    else 
+    else
         echo "File $ENV_FILE does not exist."
         cp example.importer-module.docker.env importer-module.docker.env
-        sed "s/IMPORTER_AWS_ACCESS_KEY=.*$/IMPORTER_AWS_ACCESS_KEY=${keys[0]}/;s/IMPORTER_AWS_SECRET_KEY=.*$/IMPORTER_AWS_SECRET_KEY=${keys[1]}/g" $EXAMPLE_ENV_FILE > $ENV_FILE 
+        sed "s|IMPORTER_AWS_ENDPOINT=.*$|IMPORTER_AWS_ENDPOINT=http://${LOCAL_IP}:9000|; \
+             s|IMPORTER_AWS_ACCESS_KEY=.*$|IMPORTER_AWS_ACCESS_KEY=${keys[0]}|; \
+             s|IMPORTER_AWS_SECRET_KEY=.*$|IMPORTER_AWS_SECRET_KEY=${keys[1]}|" \
+             "$EXAMPLE_ENV_FILE" > "$ENV_FILE"
     fi
     echo -e "${BOLD}Done"
 }
 
 prepare_storage_environment () {
+   checkup_environment_file
+
     echo "Starting storage services..."
     docker-compose up -d minio
 
@@ -75,7 +123,7 @@ prepare_storage_environment () {
     echo -e "\tMinIO UI is running on http://localhost:9001${NC}\n"
 
     echo "Creating bucket..."
-    docker-compose exec minio mc mb "$ALIAS_NAME/$BUCKET_NAME"
+    docker-compose exec minio mc mb "$ALIAS_NAME/$BUCKET_NAME" || true
 
     echo -e "${BOLD}Setup lifecycle..."
     docker-compose exec minio mc ilm rule add "$ALIAS_NAME/$BUCKET_NAME" --expire-days "1"
@@ -83,5 +131,6 @@ prepare_storage_environment () {
     replace_environment_file
 }
 
+get_ip
 setup_route
 prepare_storage_environment
