@@ -92,6 +92,11 @@ spec:
                 configMapKeyRef:
                   key: MAPPING_LLM_TEMPERATURE
                   name: mapping-module-docker-env
+            - name: MAPPING_LICENSE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: MAPPING_LICENSE_KEY
+                  name: mapping-module-docker-env                  
             - name: MAPPING_PORT
               valueFrom:
                 configMapKeyRef:

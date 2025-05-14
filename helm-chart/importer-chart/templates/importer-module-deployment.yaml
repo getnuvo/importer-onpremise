@@ -52,6 +52,11 @@ spec:
                 configMapKeyRef:
                   key: IMPORTER_PORT
                   name: importer-module-docker-env
+            - name: IMPORTER_LICENSE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: IMPORTER_LICENSE_KEY
+                  name: importer-module-docker-env
           image: "{{ .Values.nuvo.image.repository }}:{{ .Values.nuvo.image.tag }}"
           name: importer-module
           ports:
