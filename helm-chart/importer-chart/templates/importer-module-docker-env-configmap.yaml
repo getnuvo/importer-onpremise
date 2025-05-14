@@ -5,6 +5,7 @@ data:
   IMPORTER_DB_PASSWORD: nuvo
   IMPORTER_DB_USERNAME: nuvo
   IMPORTER_PORT: '3000'
+  IMPORTER_LICENSE_KEY: your-importer-license-key
 kind: ConfigMap
 metadata:
   labels:

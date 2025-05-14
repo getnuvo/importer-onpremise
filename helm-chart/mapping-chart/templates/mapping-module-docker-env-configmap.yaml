@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  MAPPING_BE_URL: http://importer-module.ingress-nginx.svc.cluster.local:3000
+  MAPPING_BE_URL: http://importer-module.ingress-nginx.svc.cluster.local:3000/sdk
   MAPPING_PORT: "3001"
   
   MAPPING_LLM_PROVIDER: AZURE
@@ -19,6 +19,8 @@ data:
   MAPPING_LANGFUSE_HOST: https://langfuse.example.com
   MAPPING_LANGFUSE_PUBLIC_KEY: key
   MAPPING_LANGFUSE_SECRET_KEY: key
+  
+  MAPPING_LICENSE_KEY: your-importer-license-key
 kind: ConfigMap
 metadata:
   labels:
