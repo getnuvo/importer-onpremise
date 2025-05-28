@@ -106,7 +106,10 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_BROWSER_REDIRECT_URL: "http://localhost:8000/minio"
     command: server /data --console-address ":9001"
+    networks:
+      - kong-network
 
   mongo:
     container_name: nuvo-database

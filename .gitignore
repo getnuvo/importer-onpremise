@@ -3,3 +3,4 @@ mapping-module.docker.env
 db_backup/
 kong_data/
 storage/
+minio-credential.txt
