@@ -59,6 +59,10 @@ curl -i -X POST --url http://localhost:8001/services/ \
   --data 'name=mapping-service' \
   --data 'url=http://mapping-module:3001'
 
+# add cors origin to mapping service
+curl -i -X POST --url http://localhost:8001/services/mapping-service/plugins/ \
+  --data 'name=cors'
+
 # create mapping route
 curl -i -X POST --url http://localhost:8001/services/mapping-service/routes \
   --data 'name=mapping-route' \
