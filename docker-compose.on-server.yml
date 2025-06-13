@@ -1,0 +1,134 @@
+version: "3.4"
+
+networks:
+  kong-network:
+    driver: bridge
+
+services:
+  kong-database:
+    image: postgres:13
+    container_name: kong-database
+    networks:
+      - kong-network
+    restart: always
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kong
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./kong_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  kong-migrations:
+    image: kong
+    container_name: kong-migrations
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    command: >
+      sh -c "sleep 10 && kong migrations bootstrap"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+    networks:
+      - kong-network
+
+  kong:
+    image: kong
+    depends_on:
+      - kong-database
+      - kong-migrations
+    container_name: kong
+    restart: always
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PORTAL_GUI_HOST: http://localhost:8002
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+      - "80:8000"
+      - "443:8443"
+    networks:
+      - kong-network
+
+  importer-module:
+    container_name: importer-module
+    image: getnuvo/importer:latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./importer-module.docker.env
+    links:
+      - mongo
+      - mapping-module
+      - minio
+    networks:
+      - kong-network
+
+  mapping-module:
+    container_name: mapping-module
+    image: getnuvo/mapping:latest
+    env_file:
+      - ./mapping-module.docker.env
+    ports:
+      - "3001:3001"
+    networks:
+      - kong-network
+
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./storage:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    networks:
+      - kong-network
+
+  mongo:
+    container_name: nuvo-database
+    image: mongo:latest
+    volumes:
+      - ./db_backup:/data/db
+    ports:
+      - "27018:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=nuvo
+      - MONGO_INITDB_ROOT_PASSWORD=nuvo
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - kong-network
+
+volumes:
+  storage:
