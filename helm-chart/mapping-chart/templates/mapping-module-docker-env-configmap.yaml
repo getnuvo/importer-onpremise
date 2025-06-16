@@ -16,10 +16,6 @@ data:
   MAPPING_AZURE_OPENAI_DEPLOYMENT_NAME: name
   MAPPING_AZURE_OPENAI_ENDPOINT: https://your-endpoint.openai.azure.com
   
-  MAPPING_LANGFUSE_HOST: https://langfuse.example.com
-  MAPPING_LANGFUSE_PUBLIC_KEY: key
-  MAPPING_LANGFUSE_SECRET_KEY: key
-  
   MAPPING_LICENSE_KEY: your-importer-license-key
 kind: ConfigMap
 metadata:

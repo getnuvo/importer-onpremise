@@ -67,21 +67,6 @@ spec:
                 configMapKeyRef:
                   key: MAPPING_BE_URL
                   name: mapping-module-docker-env
-            - name: MAPPING_LANGFUSE_HOST
-              valueFrom:
-                configMapKeyRef:
-                  key: MAPPING_LANGFUSE_HOST
-                  name: mapping-module-docker-env
-            - name: MAPPING_LANGFUSE_PUBLIC_KEY
-              valueFrom:
-                configMapKeyRef:
-                  key: MAPPING_LANGFUSE_PUBLIC_KEY
-                  name: mapping-module-docker-env
-            - name: MAPPING_LANGFUSE_SECRET_KEY
-              valueFrom:
-                configMapKeyRef:
-                  key: MAPPING_LANGFUSE_SECRET_KEY
-                  name: mapping-module-docker-env
             - name: MAPPING_LLM_PROVIDER
               valueFrom:
                 configMapKeyRef:
