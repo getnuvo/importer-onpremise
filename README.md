@@ -57,7 +57,7 @@ docker-compose up -d
 Once the Docker services are running, execute the route configuration script:
 
 ```bash
-./scripts/configure_routes.sh
+./scripts/configure.sh
 ```
 
 > ℹ️ Ensure Docker Compose is up and running before executing this script — it requires access to the Kong Admin API.
@@ -72,7 +72,7 @@ Routing is handled via the Kong Admin API.
 ## 🔄 Updating the Services
 To refresh your deployment with the latest version and clean up unused containers/images, run:
 ```bsh
-./scripts/update_nuvo.sh
+./scripts/update.sh
 ```
 
 This script will:
