@@ -107,7 +107,7 @@ replace_aws_environment_file () {
 prepare_storage_environment () {
     checkup_environment_file
 
-    read -p "Would you like to let us help to complete for the AWS credential ?: " isAutoCompleteAWSCredential
+    read -p "Do you want to setup your AWS S3 bucket now? (yes/no) ?: " isAutoCompleteAWSCredential
     if [[ "$isAutoCompleteAWSCredential" == "yes" || "$isAutoCompleteAWSCredential" == "y" ]]; then
         read -p "Please enter your AWS Access Key ID: " AWS_ACCESS_KEY_ID
         : ${AWS_ACCESS_KEY_ID:=""}
