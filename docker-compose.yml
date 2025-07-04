@@ -63,6 +63,9 @@ services:
       - "8000:8000"
       - "8001:8001"
       - "8002:8002"
+      # To Setup Service with SSL Protocal
+      - "80:8000"
+      - "443:8443"
     networks:
       - kong-network
 
