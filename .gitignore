@@ -2,3 +2,4 @@ importer-module.docker.env
 mapping-module.docker.env
 db_backup/
 kong_data/
+service-module.docker.env

@@ -92,6 +92,16 @@ services:
     networks:
       - kong-network
 
+  service:
+    container_name: ai-service
+    image: getnuvo/service:20457-staging
+    env_file:
+      - ./service-module.docker.env
+    ports:
+      - "3002:3002"
+    networks:
+      - kong-network
+
   mongo:
     container_name: nuvo-database
     image: mongo:latest
