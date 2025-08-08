@@ -16,6 +16,13 @@ spec:
                 name: mapping-module
                 port:
                   number: 3001
+          - path: /ai-service/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ai-service-module
+                port:
+                  number: 3002
           - path: /(.*)
             pathType: ImplementationSpecific
             backend:
