@@ -1,0 +1,4 @@
+image:
+  repository: getnuvo/service
+  tag: latest
+  pullPolicy: IfNotPresent

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml --chart -o zzz
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: ai-service-module
+  name: ai-service-module
+spec:
+  ports:
+    - name: "3002"
+      port: 3002
+      targetPort: 3002
+  selector:
+    io.kompose.service: ai-service-module

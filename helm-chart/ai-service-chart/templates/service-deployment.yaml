@@ -1,0 +1,198 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml --chart -o ai-service-chart
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: ai-service-module
+  name: ai-service-module
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ai-service-module
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml --chart -o ai-service-chart
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: ai-service-module
+    spec:
+      containers:
+        - env:
+            - name: CLEANING_ASSISTANT_AWS_BEDROCK_ACCESS_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AWS_BEDROCK_ACCESS_KEY_ID
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AWS_BEDROCK_MODEL_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AWS_BEDROCK_MODEL_ID
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AWS_BEDROCK_REGION
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AWS_BEDROCK_REGION
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AWS_BEDROCK_SECRET_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AWS_BEDROCK_SECRET_ACCESS_KEY
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AZURE_OPENAI_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AZURE_OPENAI_API_KEY
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AZURE_OPENAI_API_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AZURE_OPENAI_API_VERSION
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AZURE_OPENAI_DEPLOYMENT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AZURE_OPENAI_DEPLOYMENT_NAME
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_AZURE_OPENAI_ENDPOINT
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_LLM_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_LLM_PROVIDER
+                  name: service-module-docker-env
+            - name: CLEANING_ASSISTANT_TEMPERATURE
+              valueFrom:
+                configMapKeyRef:
+                  key: CLEANING_ASSISTANT_TEMPERATURE
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AWS_BEDROCK_ACCESS_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AWS_BEDROCK_ACCESS_KEY_ID
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AWS_BEDROCK_MODEL_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AWS_BEDROCK_MODEL_ID
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AWS_BEDROCK_REGION
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AWS_BEDROCK_REGION
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AWS_BEDROCK_SECRET_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AWS_BEDROCK_SECRET_ACCESS_KEY
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AZURE_OPENAI_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AZURE_OPENAI_API_KEY
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AZURE_OPENAI_API_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AZURE_OPENAI_API_VERSION
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AZURE_OPENAI_DEPLOYMENT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AZURE_OPENAI_DEPLOYMENT_NAME
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_AZURE_OPENAI_ENDPOINT
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_LLM_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_LLM_PROVIDER
+                  name: service-module-docker-env
+            - name: CONTEXTUAL_ENGINE_TEMPERATURE
+              valueFrom:
+                configMapKeyRef:
+                  key: CONTEXTUAL_ENGINE_TEMPERATURE
+                  name: service-module-docker-env
+            - name: SERVICE_BE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: SERVICE_BE_URL
+                  name: service-module-docker-env
+            - name: SERVICE_LICENSE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: SERVICE_LICENSE_KEY
+                  name: service-module-docker-env
+            - name: SERVICE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: SERVICE_PORT
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AWS_BEDROCK_ACCESS_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AWS_BEDROCK_ACCESS_KEY_ID
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AWS_BEDROCK_MODEL_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AWS_BEDROCK_MODEL_ID
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AWS_BEDROCK_REGION
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AWS_BEDROCK_REGION
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AWS_BEDROCK_SECRET_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AWS_BEDROCK_SECRET_ACCESS_KEY
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AZURE_OPENAI_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AZURE_OPENAI_API_KEY
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AZURE_OPENAI_API_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AZURE_OPENAI_API_VERSION
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AZURE_OPENAI_DEPLOYMENT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AZURE_OPENAI_DEPLOYMENT_NAME
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_AZURE_OPENAI_ENDPOINT
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_LLM_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_LLM_PROVIDER
+                  name: service-module-docker-env
+            - name: TEXT_TO_JS_TEMPERATURE
+              valueFrom:
+                configMapKeyRef:
+                  key: TEXT_TO_JS_TEMPERATURE
+                  name: service-module-docker-env
+          image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          name: ai-service
+          ports:
+            - containerPort: 3002
+              protocol: TCP
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: my-dockerhub-secret
