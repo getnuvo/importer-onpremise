@@ -92,6 +92,21 @@ services:
     networks:
       - kong-network
 
+  service:
+    container_name: ai-service
+    image: getnuvo/service:latest
+    env_file:
+      - ./service-module.docker.env
+    ports:
+      - "3002:3002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/sdk/service/health"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    networks:
+      - kong-network
+
   mongo:
     container_name: nuvo-database
     image: mongo:latest

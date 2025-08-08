@@ -40,6 +40,21 @@ curl -i -X POST --url http://localhost:8001/services/mapping-service/routes \
   --data 'name=mapping-route' \
   --data 'paths[]=/sdk/mapping' \
   --data 'strip_path=true'
+
+# create ai-service
+curl -i -X POST --url http://localhost:8001/services/ \
+  --data 'name=ai-service' \
+  --data 'url=http://service:3002'
+
+# add cors origin to ai service
+curl -i -X POST --url http://localhost:8001/services/ai-service/plugins/ \
+  --data 'name=cors'
+
+# create ai route
+curl -i -X POST --url http://localhost:8001/services/ai-service/routes \
+  --data 'name=ai-service-route' \
+  --data 'paths[]=/sdk/service' \
+  --data 'strip_path=false'
 }
 
 

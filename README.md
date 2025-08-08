@@ -1,8 +1,8 @@
 <!-- markdownlint-disable -->
 
 <div align="center">
-  <a href="https://getnuvo.com/" target="_blank" rel="noopener noreferrer">
-    <img width="150" src="https://general-upload.getnuvo.com/nuvo_logo_with_text.svg" alt="nuvo logo">
+  <a href="https://ingestro.com/" target="_blank" rel="noopener noreferrer">
+    <img width="150" src="https://general-upload.ingestro.com/nuvo_logo_with_text.svg" alt="nuvo logo">
   </a>
   <p><strong>Fast, secure, and scalable data imports.</strong></p>
 </div>
@@ -10,7 +10,7 @@
 <h1 align="center">Deploying the nuvo Importer Backend On-Premise</h1>
 
 <p>
-  Combine this backend setup with our <a href="https://getnuvo.com/importer">nuvo Importer UI libraries</a> to deliver a seamless and intuitive import experience directly within your platform.
+  Combine this backend setup with our <a href="https://ingestro.com/importer">nuvo Importer UI libraries</a> to deliver a seamless and intuitive import experience directly within your platform.
 </p>
 
 
@@ -29,8 +29,12 @@ This backend is compatible with the following frontend packages:
 
 Before you begin, make sure:
 
-- You’ve signed up at [nuvo](https://dashboard.getnuvo.com).
+- You’ve signed up at [ingestro](https://dashboard.ingestro.com).
 - You have your **License Key** ready for on-premise deployment.
+- You’ve created the required env files from the templates:
+   - `cp example.importer-module.docker.env importer-module.docker.env`
+   - `cp example.mapping-module.docker.env mapping-module.docker.env`
+   - `cp example.service-module.docker.env service-module.docker.env`
 
 
 ## ⚙️ Installation
@@ -65,6 +69,7 @@ Once the Docker services are running, execute the route configuration script:
 This step sets up all required services and routes for:
 - importer-module
 - mapping-module
+- ai-service-module
 
 Routing is handled via the Kong Admin API.
 
@@ -91,6 +96,7 @@ API Endpoints
 Base URL: http://localhost:8000
 - Importer Module Health Check: http://localhost:8000/sdk/v1/health
 - Mapping Module Health Check: http://localhost:8000/sdk/mapping/health
+- AI Service Module Health Check: http://localhost:8000/sdk/service/health 
 
 ## 📚 Documentation & Support
-For full deployment guides, production best practices, or technical documentation, please reach out to our team at sales@getnuvo.com.
+For full deployment guides, production best practices, or technical documentation, please reach out to our team at sales@ingestro.com.

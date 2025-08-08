@@ -1,0 +1,10 @@
+name: ai-service-module-chart 
+type: application
+appVersion: "0.0.1"
+description: A generated Helm Chart for ai-service from Skippbox Kompose
+version: 0.0.1
+apiVersion: v2
+keywords:
+  - ai-service-module-chart
+sources: []
+home: ""
