@@ -99,6 +99,11 @@ services:
       - ./service-module.docker.env
     ports:
       - "3002:3002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/sdk/service/health"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
     networks:
       - kong-network
 
