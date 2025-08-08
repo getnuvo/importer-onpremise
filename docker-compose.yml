@@ -94,7 +94,7 @@ services:
 
   service:
     container_name: ai-service
-    image: getnuvo/service:20457-staging
+    image: getnuvo/service:latest
     env_file:
       - ./service-module.docker.env
     ports:
