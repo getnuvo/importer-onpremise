@@ -175,7 +175,7 @@ helm template importer helm-chart/ingestro-importer \\
 
 # Upgrade in place
 helm upgrade "$RELEASE_NAME" helm-chart/ingestro-importer \\
- --namespace "$NAMESPACE" \ \\
+ --namespace "$NAMESPACE" \\
   --values values.develop.yaml
 
 # Remove everything
