@@ -33,7 +33,7 @@ Before you begin, make sure:
 A new production-ready Helm chart (see `helm-chart/ingestro-importer`) bundles MongoDB, importer, mapping, and AI services with ingress routing, probes, autoscaling hooks, and secret management—similar to the Qovery self-managed chart.
 
 ```bash
-cd /Users/yousafishaq/Documents/GitHub/importer-onpremise
+cd ./
 
 # Inspect defaults and craft an override file for secrets and env vars
 helm show values helm-chart/ingestro-importer > values.example.yaml
