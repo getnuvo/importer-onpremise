@@ -48,8 +48,8 @@ importer:
   env:
     IMPORTER_DB_HOST: "" # Keep empty to use the default MongoDB service name
     IMPORTER_DB_NAME: nuvo # Keep the default database name
-    IMPORTER_DB_USERNAME: admin # Change this value to your preferred database username
-    IMPORTER_DB_PASSWORD: admin # Change this value to your preferred database password
+    IMPORTER_DB_USERNAME: admin # Currently using the default database username
+    IMPORTER_DB_PASSWORD: admin # Currently using the default database password
     IMPORTER_PORT: "3000" # Keep the default port
 
   secrets:
@@ -299,8 +299,8 @@ mongo:
   securityContext: {}
 
   auth:
-    rootUsername: nuvo
-    rootPassword: nuvo
+    rootUsername: admin
+    rootPassword: admin
 
   persistence:
     enabled: true

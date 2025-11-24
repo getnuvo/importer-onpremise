@@ -5,8 +5,6 @@
 {{- $defaults := dict
   "IMPORTER_DB_HOST" (printf "mongodb://%s:%d" $mongoService (int $root.Values.mongo.service.port))
   "IMPORTER_DB_NAME" "nuvo"
-  "IMPORTER_DB_USERNAME" "admin"
-  "IMPORTER_DB_PASSWORD" "admin"
   "IMPORTER_PORT" (toString $root.Values.importer.service.port)
 }}
 {{- $overrides := default (dict) $root.Values.importer.env }}

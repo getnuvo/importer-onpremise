@@ -106,7 +106,7 @@ Routing is handled via the Kong Admin API.
 
 To refresh your deployment with the latest version and clean up unused containers/images, run:
 
-```bsh
+```bash
 ./scripts/update.sh
 ```
 
