@@ -7,7 +7,6 @@ metadata:
   labels:
     {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
   annotations:
-    {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
     {{- with $root.Values.gateway.annotations }}
 {{ toYaml . | indent 4 }}
     {{- end }}

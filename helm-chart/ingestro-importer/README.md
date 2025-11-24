@@ -66,7 +66,7 @@ If you already run an ingress controller (AWS ALB, nginx, Traefik, Istio gateway
 ```bash
 # Example: nginx ingress deployed once per cluster
 kubectl create namespace ingress-nginx
-helm repo add ingress-nginx <https://kubernetes.github.io/ingress-nginx>
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx \\
   --namespace ingress-nginx
@@ -151,7 +151,7 @@ Through the ingress (requires controller + hosts entry):
 
 ```bash
 # Importer health
-curl -H "Host: importer.customer.com" <https://importer.customer.com/sdk/v1/health>
+curl -H "Host: importer.customer.com" https://importer.customer.com/sdk/v1/health
 
 # Mapping health
 curl -H "Host: importer.customer.com" <https://importer.customer.com/sdk/mapping/health>
@@ -174,10 +174,10 @@ helm template importer helm-chart/ingestro-importer \\
   > rendered.yaml
 
 # Upgrade in place
-helm upgrade "$NAMESPACE" helm-chart/ingestro-importer \\
-  --namespace importer \\
+helm upgrade "$RELEASE_NAME" helm-chart/ingestro-importer \\
+ --namespace "$NAMESPACE" \ \\
   --values values.develop.yaml
 
 # Remove everything
-helm uninstall "$NAMESPACE" -n importer
+helm uninstall "$RELEASE_NAME" -n "$NAMESPACE"
 ```
