@@ -79,7 +79,7 @@ spec:
                 name: {{ $secretName }}
             {{- end }}
             {{- range $extraEnvFrom }}
-{{ toYaml (list .) | indent 12 }}
+{{ toYaml . | indent 12 }}
             {{- end }}
           {{- end }}
           {{- with $root.Values.aiService.extraEnv }}
