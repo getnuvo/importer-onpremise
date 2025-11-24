@@ -17,4 +17,3 @@ spec:
   maxUnavailable: {{ $root.Values.importer.pdb.maxUnavailable }}
   {{- end }}
 {{- end }}
-

@@ -24,4 +24,3 @@ spec:
   selector:
     {{- include "ingestro-importer.selectorLabels" $selector | nindent 4 }}
 {{- end }}
-

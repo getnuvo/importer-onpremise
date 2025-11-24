@@ -32,4 +32,3 @@ spec:
           averageUtilization: {{ $root.Values.aiService.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
 {{- end }}
-

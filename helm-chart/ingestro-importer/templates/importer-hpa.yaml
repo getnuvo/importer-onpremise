@@ -32,4 +32,3 @@ spec:
           averageUtilization: {{ $root.Values.importer.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
 {{- end }}
-

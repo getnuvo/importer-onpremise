@@ -17,4 +17,3 @@ spec:
   maxUnavailable: {{ $root.Values.mapping.pdb.maxUnavailable }}
   {{- end }}
 {{- end }}
-
