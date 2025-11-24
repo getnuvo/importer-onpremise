@@ -1,0 +1,35 @@
+{{- if and .Values.mapping.enabled .Values.mapping.autoscaling.enabled }}
+{{- $root := . }}
+{{- $component := "mapping" }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "hpa") }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" (dict "root" $root "component" $component) | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component) }}
+  minReplicas: {{ $root.Values.mapping.autoscaling.minReplicas }}
+  maxReplicas: {{ $root.Values.mapping.autoscaling.maxReplicas }}
+  metrics:
+    {{- if $root.Values.mapping.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $root.Values.mapping.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if $root.Values.mapping.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ $root.Values.mapping.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
+

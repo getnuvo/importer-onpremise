@@ -1,0 +1,20 @@
+{{- if and .Values.importer.enabled .Values.importer.pdb.enabled }}
+{{- $root := . }}
+{{- $component := "importer" }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "pdb") }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" (dict "root" $root "component" $component) | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "ingestro-importer.selectorLabels" (dict "root" $root "component" $component) | nindent 6 }}
+  {{- if $root.Values.importer.pdb.minAvailable }}
+  minAvailable: {{ $root.Values.importer.pdb.minAvailable }}
+  {{- else if $root.Values.importer.pdb.maxUnavailable }}
+  maxUnavailable: {{ $root.Values.importer.pdb.maxUnavailable }}
+  {{- end }}
+{{- end }}
+

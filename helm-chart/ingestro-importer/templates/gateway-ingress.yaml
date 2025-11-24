@@ -1,0 +1,55 @@
+{{- if .Values.gateway.enabled }}
+{{- $root := . }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" "gateway") }}
+  labels:
+    {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
+  annotations:
+    {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
+    {{- with $root.Values.gateway.annotations }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
+    {{- with $root.Values.gateway.cors }}
+    {{- if .enable }}
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: {{ .allowOrigin | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-methods: {{ .allowMethods | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-headers: {{ .allowHeaders | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-credentials: {{ .allowCredentials | quote }}
+    {{- end }}
+    {{- end }}
+spec:
+  {{- if $root.Values.gateway.className }}
+  ingressClassName: {{ $root.Values.gateway.className }}
+  {{- end }}
+  {{- with $root.Values.gateway.tls }}
+  tls:
+{{ toYaml . | indent 4 }}
+  {{- end }}
+  rules:
+    {{- range $host := $root.Values.gateway.hosts }}
+    - host: {{ $host.host | quote }}
+      http:
+        paths:
+          {{- range $path := $host.paths }}
+          - path: {{ $path.path | quote }}
+            pathType: {{ default "Prefix" $path.pathType }}
+            backend:
+              service:
+                {{- $service := default (dict) $path.service }}
+                {{- $component := default "importer" $service.name }}
+                {{- $serviceName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component) }}
+                name: {{ $serviceName }}
+                {{- $port := default "http" $service.port }}
+                port:
+                  {{- if kindIs "string" $port }}
+                  name: {{ $port }}
+                  {{- else }}
+                  number: {{ $port }}
+                  {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}
+

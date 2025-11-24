@@ -1,0 +1,132 @@
+{{- if .Values.mongo.enabled }}
+{{- $root := . }}
+{{- $component := "mongo" }}
+{{- $headless := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "headless") }}
+{{- $secretName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") }}
+{{- $auth := $root.Values.mongo.auth | default dict }}
+{{- $inlineAuth := dict }}
+{{- if $auth.rootUsername }}
+  {{- $_ := set $inlineAuth "MONGO_INITDB_ROOT_USERNAME" (printf "%v" $auth.rootUsername) }}
+{{- end }}
+{{- if $auth.rootPassword }}
+  {{- $_ := set $inlineAuth "MONGO_INITDB_ROOT_PASSWORD" (printf "%v" $auth.rootPassword) }}
+{{- end }}
+{{- $hasSecret := gt (len $inlineAuth) 0 }}
+{{- $podAnnotations := merge (deepCopy (default (dict) $root.Values.global.podAnnotations)) (default (dict) $root.Values.mongo.podAnnotations) }}
+{{- $selector := dict "root" $root "component" $component }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" $selector }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" $selector | nindent 4 }}
+spec:
+  serviceName: {{ $headless }}
+  replicas: {{ $root.Values.mongo.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ingestro-importer.selectorLabels" $selector | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ingestro-importer.selectorLabels" $selector | nindent 8 }}
+        {{- with $root.Values.mongo.podLabels }}
+{{ toYaml . | indent 8 }}
+        {{- end }}
+      {{- if gt (len $podAnnotations) 0 }}
+      annotations:
+{{ toYaml $podAnnotations | indent 8 }}
+      {{- end }}
+    spec:
+{{ include "ingestro-importer.imagePullSecrets" $root | nindent 6 }}
+      {{- with $root.Values.mongo.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $component }}
+          image: "{{ $root.Values.mongo.image.repository }}:{{ $root.Values.mongo.image.tag }}"
+          imagePullPolicy: {{ $root.Values.mongo.image.pullPolicy }}
+          ports:
+            - name: mongo
+              containerPort: {{ $root.Values.mongo.service.port }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: mongo
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: mongo
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          env:
+            {{- if $auth.rootUsername }}
+            - name: MONGO_INITDB_ROOT_USERNAME
+              {{- if $hasSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: MONGO_INITDB_ROOT_USERNAME
+              {{- else }}
+              value: {{ printf "%v" $auth.rootUsername | quote }}
+              {{- end }}
+            {{- end }}
+            {{- if $auth.rootPassword }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              {{- if $hasSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secretName }}
+                  key: MONGO_INITDB_ROOT_PASSWORD
+              {{- else }}
+              value: {{ printf "%v" $auth.rootPassword | quote }}
+              {{- end }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+          {{- with $root.Values.mongo.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.mongo.securityContext }}
+          securityContext:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+      {{- if not $root.Values.mongo.persistence.enabled }}
+      volumes:
+        - name: data
+          emptyDir: {}
+      {{- end }}
+      {{- with $root.Values.mongo.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.mongo.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.mongo.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+  {{- if .Values.mongo.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "ingestro-importer.componentLabels" $selector | nindent 10 }}
+      spec:
+        accessModes:
+{{ toYaml .Values.mongo.persistence.accessModes | indent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.mongo.persistence.size }}
+        {{- if .Values.mongo.persistence.storageClass }}
+        storageClassName: {{ .Values.mongo.persistence.storageClass }}
+        {{- end }}
+  {{- end }}
+{{- end }}
+

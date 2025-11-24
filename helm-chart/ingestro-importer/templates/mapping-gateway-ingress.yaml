@@ -1,0 +1,57 @@
+{{- if .Values.mappingGateway.enabled }}
+{{- $root := . }}
+{{- $hosts := .Values.mappingGateway.hosts | default (list) }}
+{{- range $hostIdx, $host := $hosts }}
+  {{- $paths := $host.paths | default (list) }}
+  {{- range $pathIdx, $path := $paths }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" (printf "mapping-%d-%d" $hostIdx $pathIdx)) }}
+  labels:
+    {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
+  annotations:
+    {{- with $root.Values.mappingGateway.annotations }}
+{{ toYaml . | indent 4 }}
+    {{- end }}
+    nginx.ingress.kubernetes.io/rewrite-target: {{ default "/" $path.rewriteTarget | quote }}
+    {{- if $path.useRegex }}
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    {{- end }}
+    {{- with $root.Values.mappingGateway.cors }}
+    {{- if .enable }}
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: {{ .allowOrigin | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-methods: {{ .allowMethods | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-headers: {{ .allowHeaders | quote }}
+    nginx.ingress.kubernetes.io/cors-allow-credentials: {{ .allowCredentials | quote }}
+    {{- end }}
+    {{- end }}
+spec:
+  {{- if $root.Values.mappingGateway.className }}
+  ingressClassName: {{ $root.Values.mappingGateway.className }}
+  {{- end }}
+  rules:
+    - host: {{ $host.host | quote }}
+      http:
+        paths:
+          - path: {{ $path.path | quote }}
+            pathType: {{ default "Prefix" $path.pathType }}
+            backend:
+              service:
+                {{- $service := default (dict) $path.service }}
+                {{- $component := default "mapping" $service.name }}
+                {{- $serviceName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component) }}
+                name: {{ $serviceName }}
+                {{- $port := default "http" $service.port }}
+                port:
+                  {{- if kindIs "string" $port }}
+                  name: {{ $port }}
+                  {{- else }}
+                  number: {{ $port }}
+                  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+

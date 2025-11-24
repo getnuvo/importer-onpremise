@@ -1,0 +1,21 @@
+{{- if .Values.mapping.enabled }}
+{{- $root := . }}
+{{- $component := "mapping" }}
+{{- $selector := dict "root" $root "component" $component }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" $selector }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" $selector | nindent 4 }}
+spec:
+  type: {{ $root.Values.mapping.service.type }}
+  ports:
+    - name: http
+      port: {{ $root.Values.mapping.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "ingestro-importer.selectorLabels" $selector | nindent 4 }}
+{{- end }}
+

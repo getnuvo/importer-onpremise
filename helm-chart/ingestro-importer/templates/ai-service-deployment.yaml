@@ -1,0 +1,126 @@
+{{- if .Values.aiService.enabled }}
+{{- $root := . }}
+{{- $component := "aiService" }}
+{{- $clusterDomain := default "cluster.local" $root.Values.clusterDomain }}
+{{- $importerService := include "ingestro-importer.componentFullname" (dict "root" $root "component" "importer") }}
+{{- $importerHost := printf "%s.%s.svc.%s" $importerService $root.Release.Namespace $clusterDomain }}
+{{- $configName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "env") }}
+{{- $secretName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") }}
+{{- $defaults := dict
+  "SERVICE_BE_URL" (printf "http://%s:%d/sdk" $importerHost (int $root.Values.importer.service.port))
+  "SERVICE_PORT" (toString $root.Values.aiService.service.port)
+}}
+{{- $overrides := default (dict) $root.Values.aiService.env }}
+{{- $configData := deepCopy $defaults }}
+{{- range $key, $value := $overrides }}
+  {{- if and (ne (printf "%v" $value) "") (ne $value nil) }}
+    {{- $_ := set $configData $key $value }}
+  {{- end }}
+{{- end }}
+{{- $hasConfig := gt (len $configData) 0 }}
+{{- $secretSource := default (dict) $root.Values.aiService.secrets }}
+{{- $secretData := dict }}
+{{- range $key, $val := $secretSource }}
+  {{- if ne (printf "%v" $val) "" }}
+    {{- $_ := set $secretData $key (printf "%v" $val) }}
+  {{- end }}
+{{- end }}
+{{- $hasSecret := gt (len $secretData) 0 }}
+{{- $podAnnotations := merge (deepCopy (default (dict) $root.Values.global.podAnnotations)) (default (dict) $root.Values.aiService.podAnnotations) }}
+{{- $selector := dict "root" $root "component" $component }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" $selector }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" $selector | nindent 4 }}
+spec:
+  {{- if not $root.Values.aiService.autoscaling.enabled }}
+  replicas: {{ $root.Values.aiService.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ingestro-importer.selectorLabels" $selector | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ingestro-importer.selectorLabels" $selector | nindent 8 }}
+        {{- with $root.Values.aiService.podLabels }}
+{{ toYaml . | indent 8 }}
+        {{- end }}
+      {{- if gt (len $podAnnotations) 0 }}
+      annotations:
+{{ toYaml $podAnnotations | indent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "ingestro-importer.serviceAccountName" (dict "root" $root "component" $component) }}
+{{ include "ingestro-importer.imagePullSecrets" $root | nindent 6 }}
+      {{- with $root.Values.aiService.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "ingestro-importer.componentSlug" (dict "component" $component) }}
+          image: "{{ $root.Values.aiService.image.repository }}:{{ $root.Values.aiService.image.tag }}"
+          imagePullPolicy: {{ $root.Values.aiService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $root.Values.aiService.service.port }}
+              protocol: TCP
+          {{- $extraEnvFrom := default (list) $root.Values.aiService.extraEnvFrom }}
+          {{- if or $hasConfig (or $hasSecret (gt (len $extraEnvFrom) 0)) }}
+          envFrom:
+            {{- if $hasConfig }}
+            - configMapRef:
+                name: {{ $configName }}
+            {{- end }}
+            {{- if $hasSecret }}
+            - secretRef:
+                name: {{ $secretName }}
+            {{- end }}
+            {{- range $extraEnvFrom }}
+{{ toYaml (list .) | indent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- with $root.Values.aiService.extraEnv }}
+          env:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- if and $root.Values.aiService.livenessProbe $root.Values.aiService.livenessProbe.enabled }}
+          livenessProbe:
+{{ toYaml (omit $root.Values.aiService.livenessProbe "enabled") | indent 12 }}
+          {{- end }}
+          {{- if and $root.Values.aiService.readinessProbe $root.Values.aiService.readinessProbe.enabled }}
+          readinessProbe:
+{{ toYaml (omit $root.Values.aiService.readinessProbe "enabled") | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.aiService.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.aiService.securityContext }}
+          securityContext:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.aiService.volumeMounts }}
+          volumeMounts:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+      {{- with $root.Values.aiService.volumes }}
+      volumes:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.aiService.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.aiService.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.aiService.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+{{- end }}
+

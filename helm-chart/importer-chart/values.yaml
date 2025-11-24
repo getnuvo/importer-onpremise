@@ -1,8 +1,0 @@
-mongo:
-  image:
-    repository: mongo
-    tag: latest
-nuvo:
-  image:
-    repository: getnuvo/importer
-    tag: latest
