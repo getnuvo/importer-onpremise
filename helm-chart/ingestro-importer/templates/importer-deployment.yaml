@@ -6,8 +6,6 @@
 {{- $configDefaults := dict
   "IMPORTER_DB_HOST" (printf "mongodb://%s:%d" (include "ingestro-importer.componentFullname" (dict "root" $root "component" "mongo")) (int $root.Values.mongo.service.port))
   "IMPORTER_DB_NAME" "nuvo"
-  "IMPORTER_DB_USERNAME" "admin"
-  "IMPORTER_DB_PASSWORD" "admin"
   "IMPORTER_PORT" (toString $root.Values.importer.service.port)
 }}
 {{- $configOverrides := default (dict) $root.Values.importer.env }}
