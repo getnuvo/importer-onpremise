@@ -1,21 +1,27 @@
 {{- if .Values.mappingGateway.enabled }}
 {{- $root := . }}
 {{- $hosts := .Values.mappingGateway.hosts | default (list) }}
-{{- range $hostIdx, $host := $hosts }}
+{{- range $host := $hosts }}
   {{- $paths := $host.paths | default (list) }}
-  {{- range $pathIdx, $path := $paths }}
+  {{- range $path := $paths }}
+    {{- $hostSlug := include "ingestro-importer.hostSlug" (dict "host" $host.host) }}
+    {{- $pathSlug := include "ingestro-importer.pathSlug" (dict "path" $path.path) }}
+    {{- $component := printf "mapping-%s-%s" $hostSlug $pathSlug }}
+    {{- $selector := dict "root" $root "component" $component }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" (printf "mapping-%d-%d" $hostIdx $pathIdx)) }}
+  name: {{ include "ingestro-importer.componentFullname" $selector }}
   labels:
     {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
   annotations:
     {{- with $root.Values.mappingGateway.annotations }}
 {{ toYaml . | indent 4 }}
     {{- end }}
-    nginx.ingress.kubernetes.io/rewrite-target: {{ default "/" $path.rewriteTarget | quote }}
+    {{- if $path.rewriteTarget }}
+    nginx.ingress.kubernetes.io/rewrite-target: {{ $path.rewriteTarget | quote }}
+    {{- end }}
     {{- if $path.useRegex }}
     nginx.ingress.kubernetes.io/use-regex: "true"
     {{- end }}
@@ -41,9 +47,9 @@ spec:
             backend:
               service:
                 {{- $service := default (dict) $path.service }}
-                {{- $component := default "mapping" $service.name }}
-                {{- $serviceName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component) }}
-                name: {{ $serviceName }}
+                {{- $componentName := default "mapping" $service.name }}
+                {{- $serviceFullname := include "ingestro-importer.componentFullname" (dict "root" $root "component" $componentName) }}
+                name: {{ $serviceFullname }}
                 {{- $port := default "http" $service.port }}
                 port:
                   {{- if kindIs "string" $port }}

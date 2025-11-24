@@ -32,7 +32,7 @@ Key points to consider:
 | `gateway.hosts`                      | Change `importer.local` to your domain          | Point the gateway at your DNS                                                           |
 | `mappingGateway.hosts`               | Change `importer.local` to your domain          | Point the gateway at your DNS. It should be the same as `gateway.hosts`                 |
 | `livenessProbe/readinessProbe`       | Adjust timings or disable in dev                | Align probes with your env                                                              |
-| `global.licenseKey`                  | Change with your Ingestro Pipelines License Key | Centralize license delivery. Set once to avoid setting it for each service indivisually |
+| `global.licenseKey`                  | Change with your Ingestro Pipelines License Key | Centralize license delivery. Set once to avoid setting it for each service individually |
 
 ### Gateway and mapping ingress annotations and CORS
 

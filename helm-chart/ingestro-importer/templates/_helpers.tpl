@@ -133,17 +133,48 @@ Return the service account name for a component.
 {{- $values := index $root.Values $component | default dict -}}
 {{- $sa := $values.serviceAccount | default dict -}}
 {{- if $sa.create | default false -}}
-{{- if $sa.name -}}
-{{- $sa.name -}}
+  {{- if $sa.name -}}
+    {{- $sa.name -}}
+  {{- else -}}
+    {{- printf "%s-%s" (include "ingestro-importer.fullname" $root) $slug | trunc 63 | trimSuffix "-" -}}
+  {{- end -}}
 {{- else -}}
-{{- printf "%s-%s" (include "ingestro-importer.fullname" $root) $slug | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- else -}}
-{{- if $sa.name -}}
-{{- $sa.name -}}
-{{- else -}}
-default
-{{- end -}}
+  {{- if $sa.name -}}
+    {{- $sa.name -}}
+  {{- else -}}
+    default
+  {{- end -}}
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create a hostname-based slug for resource naming.
+*/}}
+{{- define "ingestro-importer.hostSlug" -}}
+{{- $host := default "" .host -}}
+{{- $slug := regexReplaceAll "[^a-z0-9]+" (lower $host) "-" -}}
+{{- $trimmed := trimAll "-" $slug -}}
+{{- if $trimmed -}}
+{{- $trimmed -}}
+{{- else -}}
+host
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a path-based slug for resource naming.
+*/}}
+{{- define "ingestro-importer.pathSlug" -}}
+{{- $path := default "" .path -}}
+{{- if eq $path "" -}}
+path
+{{- else -}}
+{{- $slug := regexReplaceAll "[^a-z0-9]+" (lower $path) "-" -}}
+{{- $trimmed := trimAll "-" $slug -}}
+{{- if $trimmed -}}
+{{- $trimmed -}}
+{{- else -}}
+path
+{{- end -}}
+{{- end -}}
+{{- end -}}
