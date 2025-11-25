@@ -1,0 +1,37 @@
+{{- if .Values.mongo.enabled }}
+{{- $root := . }}
+{{- $component := "mongo" }}
+{{- $selector := dict "root" $root "component" $component }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" $selector }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" $selector | nindent 4 }}
+spec:
+  type: {{ $root.Values.mongo.service.type }}
+  ports:
+    - name: mongo
+      port: {{ $root.Values.mongo.service.port }}
+      targetPort: mongo
+      protocol: TCP
+  selector:
+    {{- include "ingestro-importer.selectorLabels" $selector | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "headless") }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" $selector | nindent 4 }}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: mongo
+      port: {{ $root.Values.mongo.service.port }}
+      targetPort: mongo
+      protocol: TCP
+  selector:
+    {{- include "ingestro-importer.selectorLabels" $selector | nindent 4 }}
+{{- end }}

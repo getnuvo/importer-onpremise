@@ -1,0 +1,28 @@
+1. Get the status of the release:
+  kubectl --namespace {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+
+2. Check service endpoints:
+  kubectl --namespace {{ .Release.Namespace }} get svc -l app.kubernetes.io/instance={{ .Release.Name }}
+
+{{- $importerReadiness := .Values.importer.readinessProbe | default (dict) }}
+{{- $importerLiveness := .Values.importer.livenessProbe | default (dict) }}
+{{- $importerHealthPath := default "/sdk/v1/health" (coalesce (index ($importerReadiness.httpGet | default (dict)) "path") (index ($importerLiveness.httpGet | default (dict)) "path")) }}
+{{- $mappingReadiness := .Values.mapping.readinessProbe | default (dict) }}
+{{- $mappingLiveness := .Values.mapping.livenessProbe | default (dict) }}
+{{- $mappingHealthPath := default "/sdk/mapping/health" (coalesce (index ($mappingReadiness.httpGet | default (dict)) "path") (index ($mappingLiveness.httpGet | default (dict)) "path")) }}
+{{- $aiServiceReadiness := .Values.aiService.readinessProbe | default (dict) }}
+{{- $aiServiceLiveness := .Values.aiService.livenessProbe | default (dict) }}
+{{- $aiServiceHealthPath := default "/sdk/service/health" (coalesce (index ($aiServiceReadiness.httpGet | default (dict)) "path") (index ($aiServiceLiveness.httpGet | default (dict)) "path")) }}
+{{- if .Values.gateway.enabled }}
+3. Health endpoints (Ingress {{ .Values.gateway.className | default "nginx" }}):
+  - Importer service: {{ $importerHealthPath }}
+  - AI service: {{ $aiServiceHealthPath }}
+  {{- if and .Values.mapping.enabled .Values.mappingGateway.enabled }}
+  - Mapping service: {{ $mappingHealthPath }}
+  {{- else if .Values.mapping.enabled }}
+  - Mapping service: {{ $mappingHealthPath }} (expose manually or enable `mappingGateway.enabled`)
+  {{- end }}
+{{- else }}
+3. No ingress was created. Expose the services manually or enable `gateway.enabled`.
+{{- end }}
+

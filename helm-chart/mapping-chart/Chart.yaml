@@ -1,8 +1,0 @@
-name: mapping-module-chart
-description: A generated Helm Chart for mapping-module-chart from Skippbox Kompose
-version: 0.0.1
-apiVersion: v2
-keywords:
-  - mapping-module-chart
-sources:
-home:

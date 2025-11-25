@@ -1,0 +1,32 @@
+{{- if .Values.mapping.enabled }}
+{{- $root := . }}
+{{- $component := "mapping" }}
+{{- $clusterDomain := default "cluster.local" $root.Values.clusterDomain }}
+{{- $importerService := include "ingestro-importer.componentFullname" (dict "root" $root "component" "importer") }}
+{{- $importerHost := printf "%s.%s.svc.%s" $importerService $root.Release.Namespace $clusterDomain }}
+{{- $defaults := dict
+  "MAPPING_BE_URL" (printf "http://%s:%d/sdk" $importerHost (int $root.Values.importer.service.port))
+  "MAPPING_PORT" (toString $root.Values.mapping.service.port)
+  "MAPPING_LLM_PROVIDER" "AZURE"
+  "MAPPING_LLM_TEMPERATURE" "0.7"
+}}
+{{- $overrides := default (dict) $root.Values.mapping.env }}
+{{- $env := deepCopy $defaults }}
+{{- range $key, $value := $overrides }}
+  {{- if and (ne (printf "%v" $value) "") (ne $value nil) }}
+    {{- $_ := set $env $key $value }}
+  {{- end }}
+{{- end }}
+{{- if gt (len $env) 0 }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "env") }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" (dict "root" $root "component" $component) | nindent 4 }}
+data:
+{{- range $key, $value := $env }}
+  {{ $key }}: {{ $value | quote }}
+{{- end }}
+{{- end }}
+{{- end }}

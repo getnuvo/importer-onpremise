@@ -1,0 +1,19 @@
+{{- if and .Values.aiService.enabled .Values.aiService.pdb.enabled }}
+{{- $root := . }}
+{{- $component := "aiService" }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "pdb") }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" (dict "root" $root "component" $component) | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "ingestro-importer.selectorLabels" (dict "root" $root "component" $component) | nindent 6 }}
+  {{- if $root.Values.aiService.pdb.minAvailable }}
+  minAvailable: {{ $root.Values.aiService.pdb.minAvailable }}
+  {{- else if $root.Values.aiService.pdb.maxUnavailable }}
+  maxUnavailable: {{ $root.Values.aiService.pdb.maxUnavailable }}
+  {{- end }}
+{{- end }}

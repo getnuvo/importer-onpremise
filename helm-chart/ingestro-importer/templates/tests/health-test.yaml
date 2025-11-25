@@ -1,0 +1,57 @@
+{{- $root := . }}
+{{- $checks := list }}
+{{- if $root.Values.importer.enabled }}
+{{- $service := include "ingestro-importer.componentFullname" (dict "root" $root "component" "importer") }}
+{{- $checks = append $checks (dict "name" "importer" "url" (printf "http://%s:%d/sdk/v1/health" $service (int $root.Values.importer.service.port))) }}
+{{- end }}
+{{- if $root.Values.mapping.enabled }}
+{{- $service := include "ingestro-importer.componentFullname" (dict "root" $root "component" "mapping") }}
+{{- $checks = append $checks (dict "name" "mapping" "url" (printf "http://%s:%d/health" $service (int $root.Values.mapping.service.port))) }}
+{{- end }}
+{{- if $root.Values.aiService.enabled }}
+{{- $service := include "ingestro-importer.componentFullname" (dict "root" $root "component" "aiService") }}
+{{- $checks = append $checks (dict "name" "ai-service" "url" (printf "http://%s:%d/sdk/service/health" $service (int $root.Values.aiService.service.port))) }}
+{{- end }}
+{{- $tests := .Values.tests | default (dict) }}
+{{- $healthTest := $tests.health | default (dict) }}
+{{- $healthImage := $healthTest.image | default (dict) }}
+{{- $healthImageRepo := default "curlimages/curl" $healthImage.repository }}
+{{- $healthImageTag := default "8.11.1" $healthImage.tag }}
+{{- $healthImagePullPolicy := default "IfNotPresent" $healthImage.pullPolicy }}
+{{- $healthImageRef := printf "%s:%s" $healthImageRepo $healthImageTag }}
+{{- if gt (len $checks) 0 }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" "health-test") }}
+  labels:
+    {{- include "ingestro-importer.commonLabels" $root | nindent 4 }}
+    {{- include "ingestro-importer.selectorLabels" (dict "root" $root "component" "health-test") | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      annotations:
+        "helm.sh/hook-weight": "5"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: health-check
+          image: {{ $healthImageRef }}
+          imagePullPolicy: {{ $healthImagePullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              set -euo pipefail
+              {{- range $checks }}
+              echo "Checking {{ .name }} health"
+              curl -fsS {{ .url }}
+              {{- end }}
+              echo "health checks passed"
+      serviceAccountName: {{ include "ingestro-importer.serviceAccountName" (dict "root" $root "component" "health-test") }}
+{{- end }}
+

@@ -1,0 +1,123 @@
+{{- if .Values.importer.enabled }}
+{{- $root := . }}
+{{- $component := "importer" }}
+{{- $configName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "env") }}
+{{- $secretName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") }}
+{{- $configDefaults := dict
+  "IMPORTER_DB_HOST" (printf "mongodb://%s:%d" (include "ingestro-importer.componentFullname" (dict "root" $root "component" "mongo")) (int $root.Values.mongo.service.port))
+  "IMPORTER_DB_NAME" "nuvo"
+  "IMPORTER_PORT" (toString $root.Values.importer.service.port)
+}}
+{{- $configOverrides := default (dict) $root.Values.importer.env }}
+{{- $configData := deepCopy $configDefaults }}
+{{- range $key, $value := $configOverrides }}
+  {{- if and (ne (printf "%v" $value) "") (ne $value nil) }}
+    {{- $_ := set $configData $key $value }}
+  {{- end }}
+{{- end }}
+{{- $hasConfig := gt (len $configData) 0 }}
+{{- $secretSource := default (dict) $root.Values.importer.secrets }}
+{{- $secretData := dict }}
+{{- range $key, $val := $secretSource }}
+  {{- if ne (printf "%v" $val) "" }}
+    {{- $_ := set $secretData $key (printf "%v" $val) }}
+  {{- end }}
+{{- end }}
+{{- $hasSecret := gt (len $secretData) 0 }}
+{{- $podAnnotations := merge (deepCopy (default (dict) $root.Values.global.podAnnotations)) (default (dict) $root.Values.importer.podAnnotations) }}
+{{- $selector := dict "root" $root "component" $component }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" (dict "root" $root "component" $component) }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" (dict "root" $root "component" $component) | nindent 4 }}
+spec:
+  {{- if not $root.Values.importer.autoscaling.enabled }}
+  replicas: {{ $root.Values.importer.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ingestro-importer.selectorLabels" $selector | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ingestro-importer.selectorLabels" $selector | nindent 8 }}
+        {{- with $root.Values.importer.podLabels }}
+{{ toYaml . | indent 8 }}
+        {{- end }}
+      {{- if gt (len $podAnnotations) 0 }}
+      annotations:
+{{ toYaml $podAnnotations | indent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "ingestro-importer.serviceAccountName" (dict "root" $root "component" $component) }}
+{{ include "ingestro-importer.imagePullSecrets" $root | nindent 6 }}
+      {{- with $root.Values.importer.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "ingestro-importer.componentSlug" (dict "component" $component) }}
+          image: "{{ $root.Values.importer.image.repository }}:{{ $root.Values.importer.image.tag }}"
+          imagePullPolicy: {{ $root.Values.importer.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $root.Values.importer.service.port }}
+              protocol: TCP
+          {{- $extraEnvFrom := default (list) $root.Values.importer.extraEnvFrom }}
+          {{- if or $hasConfig (or $hasSecret (gt (len $extraEnvFrom) 0)) }}
+          envFrom:
+            {{- if $hasConfig }}
+            - configMapRef:
+                name: {{ $configName }}
+            {{- end }}
+            {{- if $hasSecret }}
+            - secretRef:
+                name: {{ $secretName }}
+            {{- end }}
+            {{- range $extraEnvFrom }}
+{{ toYaml . | indent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- with $root.Values.importer.extraEnv }}
+          env:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- if and $root.Values.importer.livenessProbe $root.Values.importer.livenessProbe.enabled }}
+          livenessProbe:
+{{ toYaml (omit $root.Values.importer.livenessProbe "enabled") | indent 12 }}
+          {{- end }}
+          {{- if and $root.Values.importer.readinessProbe $root.Values.importer.readinessProbe.enabled }}
+          readinessProbe:
+{{ toYaml (omit $root.Values.importer.readinessProbe "enabled") | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.importer.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.importer.securityContext }}
+          securityContext:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.importer.volumeMounts }}
+          volumeMounts:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+      {{- with $root.Values.importer.volumes }}
+      volumes:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.importer.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.importer.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.importer.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,402 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ingestro Importer Helm chart values",
+  "type": "object",
+  "properties": {
+    "nameOverride": {
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "type": "string"
+    },
+    "clusterDomain": {
+      "type": "string"
+    },
+    "global": {
+      "type": "object",
+      "properties": {
+        "imagePullSecrets": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "imageCredentials": {
+          "type": "object",
+          "properties": {
+            "registry": {
+              "type": "string",
+              "minLength": 1
+            },
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          },
+          "required": ["registry", "password", "username"],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "create": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "licenseKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "podAnnotations": {
+          "type": "object"
+        },
+        "extraLabels": {
+          "type": "object"
+        }
+      }
+    },
+    "importer": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "replicaCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tag": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pullPolicy": {
+              "type": "string"
+            }
+          },
+          "required": ["repository", "tag"]
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "port": {
+              "type": ["integer", "string"]
+            }
+          }
+        },
+        "env": {
+          "type": "object"
+        },
+        "secrets": {
+          "type": "object"
+        },
+        "livenessProbe": {
+          "type": "object"
+        },
+        "readinessProbe": {
+          "type": "object"
+        }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "required": ["repository", "tag"]
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "port": {
+              "type": ["integer", "string"]
+            }
+          }
+        },
+        "cors": {
+          "type": "object",
+          "properties": {
+            "enable": {
+              "type": "boolean"
+            },
+            "allowOrigin": {
+              "type": "string"
+            },
+            "allowMethods": {
+              "type": "string"
+            },
+            "allowHeaders": {
+              "type": "string"
+            },
+            "allowCredentials": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "aiService": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "required": ["repository", "tag"]
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "port": {
+              "type": ["integer", "string"]
+            }
+          }
+        }
+      }
+    },
+    "mongo": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "rootUsername": {
+              "type": "string"
+            },
+            "rootPassword": {
+              "type": "string"
+            }
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "string"
+            },
+            "storageClass": {
+              "type": "string"
+            },
+            "accessModes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "gateway": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "className": {
+          "type": "string"
+        },
+        "cors": {
+          "type": "object",
+          "properties": {
+            "enable": {
+              "type": "boolean"
+            },
+            "allowOrigin": {
+              "type": "string"
+            },
+            "allowMethods": {
+              "type": "string"
+            },
+            "allowHeaders": {
+              "type": "string"
+            },
+            "allowCredentials": {
+              "type": "string"
+            }
+          }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string",
+                "minLength": 1
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "pathType": {
+                      "type": "string"
+                    },
+                    "useRegex": {
+                      "type": "boolean"
+                    },
+                    "rewriteTarget": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": ["integer", "string"]
+                        }
+                      }
+                    }
+                  },
+                  "required": ["path", "service"]
+                }
+              }
+            },
+            "required": ["host", "paths"]
+          }
+        }
+      }
+    },
+    "mappingGateway": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "className": {
+          "type": "string"
+        },
+        "cors": {
+          "type": "object",
+          "properties": {
+            "enable": {
+              "type": "boolean"
+            },
+            "allowOrigin": {
+              "type": "string"
+            },
+            "allowMethods": {
+              "type": "string"
+            },
+            "allowHeaders": {
+              "type": "string"
+            },
+            "allowCredentials": {
+              "type": "string"
+            }
+          }
+        },
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "host": {
+                "type": "string",
+                "minLength": 1
+              },
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "pathType": {
+                      "type": "string"
+                    },
+                    "useRegex": {
+                      "type": "boolean"
+                    },
+                    "rewriteTarget": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "port": {
+                          "type": ["integer", "string"]
+                        }
+                      }
+                    }
+                  },
+                  "required": ["path", "service"]
+                }
+              }
+            },
+            "required": ["host", "paths"]
+          }
+        }
+      }
+    }
+  },
+  "required": ["global"]
+}

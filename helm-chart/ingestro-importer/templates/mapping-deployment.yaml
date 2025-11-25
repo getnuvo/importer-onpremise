@@ -1,0 +1,127 @@
+{{- if .Values.mapping.enabled }}
+{{- $root := . }}
+{{- $component := "mapping" }}
+{{- $clusterDomain := default "cluster.local" $root.Values.clusterDomain }}
+{{- $importerService := include "ingestro-importer.componentFullname" (dict "root" $root "component" "importer") }}
+{{- $importerHost := printf "%s.%s.svc.%s" $importerService $root.Release.Namespace $clusterDomain }}
+{{- $configName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "env") }}
+{{- $secretName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") }}
+{{- $defaults := dict
+  "MAPPING_BE_URL" (printf "http://%s:%d/sdk" $importerHost (int $root.Values.importer.service.port))
+  "MAPPING_PORT" (toString $root.Values.mapping.service.port)
+  "MAPPING_LLM_PROVIDER" "AZURE"
+  "MAPPING_LLM_TEMPERATURE" "0.7"
+}}
+{{- $overrides := default (dict) $root.Values.mapping.env }}
+{{- $configData := deepCopy $defaults }}
+{{- range $key, $value := $overrides }}
+  {{- if and (ne (printf "%v" $value) "") (ne $value nil) }}
+    {{- $_ := set $configData $key $value }}
+  {{- end }}
+{{- end }}
+{{- $hasConfig := gt (len $configData) 0 }}
+{{- $secretSource := default (dict) $root.Values.mapping.secrets }}
+{{- $secretData := dict }}
+{{- range $key, $val := $secretSource }}
+  {{- if ne (printf "%v" $val) "" }}
+    {{- $_ := set $secretData $key (printf "%v" $val) }}
+  {{- end }}
+{{- end }}
+{{- $hasSecret := gt (len $secretData) 0 }}
+{{- $podAnnotations := merge (deepCopy (default (dict) $root.Values.global.podAnnotations)) (default (dict) $root.Values.mapping.podAnnotations) }}
+{{- $selector := dict "root" $root "component" $component }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ingestro-importer.componentFullname" $selector }}
+  labels:
+    {{- include "ingestro-importer.componentLabels" $selector | nindent 4 }}
+spec:
+  {{- if not $root.Values.mapping.autoscaling.enabled }}
+  replicas: {{ $root.Values.mapping.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ingestro-importer.selectorLabels" $selector | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ingestro-importer.selectorLabels" $selector | nindent 8 }}
+        {{- with $root.Values.mapping.podLabels }}
+{{ toYaml . | indent 8 }}
+        {{- end }}
+      {{- if gt (len $podAnnotations) 0 }}
+      annotations:
+{{ toYaml $podAnnotations | indent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "ingestro-importer.serviceAccountName" (dict "root" $root "component" $component) }}
+{{ include "ingestro-importer.imagePullSecrets" $root | nindent 6 }}
+      {{- with $root.Values.mapping.podSecurityContext }}
+      securityContext:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "ingestro-importer.componentSlug" (dict "component" $component) }}
+          image: "{{ $root.Values.mapping.image.repository }}:{{ $root.Values.mapping.image.tag }}"
+          imagePullPolicy: {{ $root.Values.mapping.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $root.Values.mapping.service.port }}
+              protocol: TCP
+          {{- $extraEnvFrom := default (list) $root.Values.mapping.extraEnvFrom }}
+          {{- if or $hasConfig (or $hasSecret (gt (len $extraEnvFrom) 0)) }}
+          envFrom:
+            {{- if $hasConfig }}
+            - configMapRef:
+                name: {{ $configName }}
+            {{- end }}
+            {{- if $hasSecret }}
+            - secretRef:
+                name: {{ $secretName }}
+            {{- end }}
+            {{- range $extraEnvFrom }}
+{{ toYaml . | indent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- with $root.Values.mapping.extraEnv }}
+          env:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- if and $root.Values.mapping.livenessProbe $root.Values.mapping.livenessProbe.enabled }}
+          livenessProbe:
+{{ toYaml (omit $root.Values.mapping.livenessProbe "enabled") | indent 12 }}
+          {{- end }}
+          {{- if and $root.Values.mapping.readinessProbe $root.Values.mapping.readinessProbe.enabled }}
+          readinessProbe:
+{{ toYaml (omit $root.Values.mapping.readinessProbe "enabled") | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.mapping.resources }}
+          resources:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.mapping.securityContext }}
+          securityContext:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with $root.Values.mapping.volumeMounts }}
+          volumeMounts:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+      {{- with $root.Values.mapping.volumes }}
+      volumes:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.mapping.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.mapping.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with $root.Values.mapping.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+{{- end }}
