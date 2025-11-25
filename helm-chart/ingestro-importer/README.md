@@ -154,10 +154,10 @@ Through the ingress (requires controller + hosts entry):
 curl -H "Host: importer.customer.com" https://importer.customer.com/sdk/v1/health
 
 # Mapping health
-curl -H "Host: importer.customer.com" <https://importer.customer.com/sdk/mapping/health>
+curl -H "Host: importer.customer.com" https://importer.customer.com/sdk/mapping/health
 
 # AI service health
-curl -H "Host: importer.customer.com" <https://importer.customer.com/sdk/service/health>
+curl -H "Host: importer.customer.com" https://importer.customer.com/sdk/service/health
 ```
 
 If you prefer Postman, set the request URL to `http://importer.local:8080/...` (or use `localhost` plus the `Host` header), and provide any auth headers/body your APIs expect.
