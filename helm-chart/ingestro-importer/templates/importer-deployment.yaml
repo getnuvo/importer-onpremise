@@ -2,7 +2,6 @@
 {{- $root := . }}
 {{- $component := "importer" }}
 {{- $configName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "env") }}
-{{- $secretName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") }}
 {{- $configDefaults := dict
   "IMPORTER_DB_HOST" (printf "mongodb://%s:%d" (include "ingestro-importer.componentFullname" (dict "root" $root "component" "mongo")) (int $root.Values.mongo.service.port))
   "IMPORTER_DB_NAME" "nuvo"
@@ -23,7 +22,13 @@
     {{- $_ := set $secretData $key (printf "%v" $val) }}
   {{- end }}
 {{- end }}
-{{- $hasSecret := gt (len $secretData) 0 }}
+{{- $secretRef := default (dict) $root.Values.importer.secretRef }}
+{{- $existingSecret := default "" $secretRef.existingSecret }}
+{{- $externalSecret := default (dict) $root.Values.importer.externalSecret }}
+{{- $externalEnabled := default false $externalSecret.enabled }}
+{{- $hasInlineSecret := gt (len $secretData) 0 }}
+{{- $hasSecret := or $hasInlineSecret (ne $existingSecret "") $externalEnabled }}
+{{- $secretName := include "ingestro-importer.secretName" (dict "root" $root "component" $component) }}
 {{- $podAnnotations := merge (deepCopy (default (dict) $root.Values.global.podAnnotations)) (default (dict) $root.Values.importer.podAnnotations) }}
 {{- $selector := dict "root" $root "component" $component }}
 apiVersion: apps/v1
