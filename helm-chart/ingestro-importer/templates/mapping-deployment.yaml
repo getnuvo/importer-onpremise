@@ -5,7 +5,6 @@
 {{- $importerService := include "ingestro-importer.componentFullname" (dict "root" $root "component" "importer") }}
 {{- $importerHost := printf "%s.%s.svc.%s" $importerService $root.Release.Namespace $clusterDomain }}
 {{- $configName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "env") }}
-{{- $secretName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") }}
 {{- $defaults := dict
   "MAPPING_BE_URL" (printf "http://%s:%d/sdk" $importerHost (int $root.Values.importer.service.port))
   "MAPPING_PORT" (toString $root.Values.mapping.service.port)
@@ -27,7 +26,13 @@
     {{- $_ := set $secretData $key (printf "%v" $val) }}
   {{- end }}
 {{- end }}
-{{- $hasSecret := gt (len $secretData) 0 }}
+{{- $secretRef := default (dict) $root.Values.mapping.secretRef }}
+{{- $existingSecret := default "" $secretRef.existingSecret }}
+{{- $externalSecret := default (dict) $root.Values.mapping.externalSecret }}
+{{- $externalEnabled := default false $externalSecret.enabled }}
+{{- $hasInlineSecret := gt (len $secretData) 0 }}
+{{- $hasSecret := or $hasInlineSecret (ne $existingSecret "") $externalEnabled }}
+{{- $secretName := include "ingestro-importer.secretName" (dict "root" $root "component" $component) }}
 {{- $podAnnotations := merge (deepCopy (default (dict) $root.Values.global.podAnnotations)) (default (dict) $root.Values.mapping.podAnnotations) }}
 {{- $selector := dict "root" $root "component" $component }}
 apiVersion: apps/v1

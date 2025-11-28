@@ -34,6 +34,47 @@ Key points to consider:
 | `livenessProbe/readinessProbe`       | Adjust timings or disable in dev                | Align probes with your env                                                              |
 | `global.licenseKey`                  | Change with your Ingestro Pipelines License Key | Centralize license delivery. Set once to avoid setting it for each service individually |
 
+### Secret handling (inline, existing, or ExternalSecret)
+
+Each workload (importer, mapping, aiService) supports three approaches:
+
+1. **Inline secrets** (default) via the `*.secrets` block (plus `global.licenseKey`). Helm renders an Opaque Secret in the namespace.
+2. **Reference a pre-created secret** by setting `*.secretRef.existingSecret`. Use this when another tool (e.g. AWS Secrets Manager + External Secrets Operator) already populates a Kubernetes `Secret`.
+3. **Ask the chart to create an ExternalSecret** by enabling `*.externalSecret`. This renders an [`ExternalSecret`](https://external-secrets.io/latest/introduction/) resource that syncs from your `SecretStore`/`ClusterSecretStore` into the same secret that pods consume.
+
+Example: sourcing importer credentials from AWS Secrets Manager via External Secrets Operator:
+
+```yaml
+importer:
+  externalSecret:
+    enabled: true
+    name: importer-license-external
+    refreshInterval: 1h
+    secretStoreRef:
+      name: aws-ssm
+      kind: ClusterSecretStore
+    target:
+      name: ingestro-importer-importer-secret
+      creationPolicy: Owner
+    data:
+      - secretKey: IMPORTER_LICENSE_KEY
+        remoteRef:
+          key: /nuvo/importer
+          property: license
+      - secretKey: IMPORTER_AWS_ACCESS_KEY
+        remoteRef:
+          key: /nuvo/importer
+          property: awsAccessKey
+      - secretKey: IMPORTER_AWS_SECRET_KEY
+        remoteRef:
+          key: /nuvo/importer
+          property: awsSecretKey
+```
+
+Repeat for `mapping.externalSecret` or `aiService.externalSecret` if those secrets live in AWS as well. If you already create ExternalSecrets outside this chart, leave `externalSecret.enabled=false` and set `secretRef.existingSecret` to the name of the resulting Kubernetes `Secret`.
+
+> **Prerequisite:** enabling `*.externalSecret` assumes the [External Secrets Operator](https://external-secrets.io/latest/introduction/) CRDs are installed in your cluster and a `SecretStore`/`ClusterSecretStore` is configured to talk to AWS Secrets Manager or Parameter Store.
+
 ### Gateway and mapping ingress annotations and CORS
 
 Both ingress layers now expose optional CORS flags. Set `gateway.cors.enable` and/or `mappingGateway.cors.enable` to `true` if browsers call the `/sdk/v1`, `/sdk/service`, or `/sdk/mapping` endpoints directly.

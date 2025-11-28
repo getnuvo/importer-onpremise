@@ -59,6 +59,23 @@ importer:
     IMPORTER_AWS_REGION: "" # Replace with your AWS region
     IMPORTER_AWS_S3_BUCKET: "" # Replace with your AWS S3 bucket name
 
+  secretRef:
+    existingSecret: "" # Reference an existing Kubernetes Secret instead of creating one
+
+  externalSecret:
+    enabled: false
+    name: "" # Name of the ExternalSecret resource (defaults to <release>-...-secret-external)
+    refreshInterval: 1h
+    secretStoreRef:
+      name: "" # Required when enabled
+      kind: ClusterSecretStore
+    target:
+      name: "" # Target secret name (defaults to the standard component secret name)
+      creationPolicy: Owner
+      deletionPolicy: ""
+    data: [] # List of secretKey/remoteRef entries
+    dataFrom: [] # Optional entries for extract/find operations
+
   extraEnv: []
   extraEnvFrom: []
 
@@ -139,6 +156,23 @@ mapping:
     MAPPING_AZURE_OPENAI_API_VERSION: "" # Replace with your Azure OpenAI API version
     MAPPING_AZURE_OPENAI_DEPLOYMENT_NAME: "" # Replace with your Azure OpenAI deployment name
     MAPPING_AZURE_OPENAI_ENDPOINT: "" # Replace with your Azure OpenAI endpoint
+
+  secretRef:
+    existingSecret: "" # Reference an existing Kubernetes Secret instead of creating one
+
+  externalSecret:
+    enabled: false
+    name: ""
+    refreshInterval: 1h
+    secretStoreRef:
+      name: ""
+      kind: ClusterSecretStore
+    target:
+      name: ""
+      creationPolicy: Owner
+      deletionPolicy: ""
+    data: []
+    dataFrom: []
 
   extraEnv: []
   extraEnvFrom: []
@@ -240,6 +274,23 @@ aiService:
     TEXT_TO_JS_AZURE_OPENAI_ENDPOINT: "" # Replace with your Azure OpenAI endpoint
     TEXT_TO_JS_LLM_PROVIDER: BEDROCK # Replace with your LLM provider: AZURE or BEDROCK
     TEXT_TO_JS_TEMPERATURE: "0.7" # Change this value to adjust the temperature of the LLM
+
+  secretRef:
+    existingSecret: "" # Reference an existing Kubernetes Secret instead of creating one
+
+  externalSecret:
+    enabled: false
+    name: ""
+    refreshInterval: 1h
+    secretStoreRef:
+      name: ""
+      kind: ClusterSecretStore
+    target:
+      name: ""
+      creationPolicy: Owner
+      deletionPolicy: ""
+    data: []
+    dataFrom: []
 
   extraEnv: []
   extraEnvFrom: []

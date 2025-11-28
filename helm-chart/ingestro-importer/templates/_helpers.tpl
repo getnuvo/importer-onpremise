@@ -178,3 +178,27 @@ path
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return the secret name that should be referenced by a component.
+*/}}
+{{- define "ingestro-importer.secretName" -}}
+{{- $root := .root -}}
+{{- $component := .component -}}
+{{- $values := index $root.Values $component | default dict -}}
+{{- $secretRef := $values.secretRef | default dict -}}
+{{- $existing := $secretRef.existingSecret | default "" -}}
+{{- if $existing }}
+  {{- $existing -}}
+{{- else -}}
+  {{- $external := $values.externalSecret | default dict -}}
+  {{- $target := $external.target | default dict -}}
+  {{- $defaultName := include "ingestro-importer.componentFullname" (dict "root" $root "component" $component "suffix" "secret") -}}
+  {{- $targetName := default $defaultName $target.name -}}
+  {{- if and ($external.enabled) $targetName }}
+    {{- $targetName -}}
+  {{- else -}}
+    {{- $defaultName -}}
+  {{- end -}}
+{{- end -}}
+{{- end -}}

@@ -3,11 +3,27 @@
 {{- $hosts := .Values.mappingGateway.hosts | default (list) }}
 {{- range $host := $hosts }}
   {{- $paths := $host.paths | default (list) }}
-  {{- range $path := $paths }}
-    {{- $hostSlug := include "ingestro-importer.hostSlug" (dict "host" $host.host) }}
-    {{- $pathSlug := include "ingestro-importer.pathSlug" (dict "path" $path.path) }}
-    {{- $component := printf "mapping-%s-%s" $hostSlug $pathSlug }}
-    {{- $selector := dict "root" $root "component" $component }}
+  {{- if not (gt (len $paths) 0) }}
+    {{- continue }}
+  {{- end }}
+  {{- $hostSlug := include "ingestro-importer.hostSlug" (dict "host" $host.host) }}
+  {{- $component := printf "mapping-%s" $hostSlug }}
+  {{- $selector := dict "root" $root "component" $component }}
+  {{- $hostSettings := dict "rewriteTarget" "" "useRegex" false }}
+  {{- range $paths }}
+    {{- $rewrite := default "" .rewriteTarget }}
+    {{- if $rewrite }}
+      {{- $current := index $hostSettings "rewriteTarget" }}
+      {{- if and $current (ne $current $rewrite) }}
+        {{- fail (printf "mappingGateway host %q has multiple rewriteTarget values; use a shared target per host to keep a single ingress." $host.host) }}
+      {{- else }}
+        {{- $_ := set $hostSettings "rewriteTarget" $rewrite }}
+      {{- end }}
+    {{- end }}
+    {{- if .useRegex }}
+      {{- $_ := set $hostSettings "useRegex" true }}
+    {{- end }}
+  {{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -19,10 +35,11 @@ metadata:
     {{- with $root.Values.mappingGateway.annotations }}
 {{ toYaml . | indent 4 }}
     {{- end }}
-    {{- if $path.rewriteTarget }}
-    nginx.ingress.kubernetes.io/rewrite-target: {{ $path.rewriteTarget | quote }}
+    {{- $rewriteTarget := index $hostSettings "rewriteTarget" }}
+    {{- if $rewriteTarget }}
+    nginx.ingress.kubernetes.io/rewrite-target: {{ $rewriteTarget | quote }}
     {{- end }}
-    {{- if $path.useRegex }}
+    {{- if index $hostSettings "useRegex" }}
     nginx.ingress.kubernetes.io/use-regex: "true"
     {{- end }}
     {{- with $root.Values.mappingGateway.cors }}
@@ -42,6 +59,7 @@ spec:
     - host: {{ $host.host | quote }}
       http:
         paths:
+          {{- range $path := $paths }}
           - path: {{ $path.path | quote }}
             pathType: {{ default "Prefix" $path.pathType }}
             backend:
@@ -57,6 +75,6 @@ spec:
                   {{- else }}
                   number: {{ $port }}
                   {{- end }}
-  {{- end }}
+          {{- end }}
 {{- end }}
 {{- end }}
