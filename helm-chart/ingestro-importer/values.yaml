@@ -7,9 +7,25 @@ clusterDomain: cluster.local
 global:
   imagePullSecrets: []
   imageCredentials:
+    name: "" # Optional override for the Kubernetes Secret name
+    create: false # Set to true to render a Secret from the inline credentials
     registry: https://index.docker.io/v1/
     username: getnuvo
-    password: "" # replace with your Docker Hub password
+    password: "" # Replace with your Docker Hub password when create=true
+    email: "" # Optional registry e-mail address
+    externalSecret:
+      enabled: false
+      name: "" # Name of the ExternalSecret resource (defaults to <release>-registry-external)
+      refreshInterval: 1h
+      secretStoreRef:
+        name: "" # Required when enabled
+        kind: ClusterSecretStore
+      target:
+        name: "" # Defaults to the managed image pull secret name
+        creationPolicy: Owner
+        deletionPolicy: ""
+      data: [] # Provide entries that populate the .dockerconfigjson key
+      dataFrom: [] # Optional extract/find operations
   licenseKey: "" # replace with your Ingestro license key
   podAnnotations: {}
   extraLabels: {}
