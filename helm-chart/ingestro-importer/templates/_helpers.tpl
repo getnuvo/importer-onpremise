@@ -85,8 +85,16 @@ Render imagePullSecrets for workloads.
     {{- $secrets = append $secrets (dict "name" .name) }}
   {{- end }}
 {{- end }}
-{{- if and $root.Values.global.imageCredentials.create ($root.Values.global.imageCredentials.password) }}
-  {{- $secrets = append $secrets (dict "name" (include "ingestro-importer.imagePullSecretName" $root)) }}
+{{- $creds := $root.Values.global.imageCredentials | default dict }}
+{{- $external := $creds.externalSecret | default dict }}
+{{- $externalEnabled := default false $external.enabled }}
+{{- $target := $external.target | default dict }}
+{{- $defaultSecretName := include "ingestro-importer.imagePullSecretName" $root }}
+{{- $externalTargetName := default $defaultSecretName $target.name }}
+{{- if $externalEnabled }}
+  {{- $secrets = append $secrets (dict "name" $externalTargetName) }}
+{{- else if and $creds.create ($creds.password) }}
+  {{- $secrets = append $secrets (dict "name" $defaultSecretName) }}
 {{- end }}
 {{- if gt (len $secrets) 0 }}
 imagePullSecrets:

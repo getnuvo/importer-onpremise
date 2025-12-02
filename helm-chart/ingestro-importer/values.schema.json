@@ -24,6 +24,12 @@
         "imageCredentials": {
           "type": "object",
           "properties": {
+            "name": {
+              "type": "string"
+            },
+            "create": {
+              "type": "boolean"
+            },
             "registry": {
               "type": "string"
             },
@@ -32,6 +38,54 @@
             },
             "password": {
               "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "externalSecret": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "refreshInterval": {
+                  "type": "string"
+                },
+                "secretStoreRef": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "target": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "creationPolicy": {
+                      "type": "string"
+                    },
+                    "deletionPolicy": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "data": {
+                  "type": "array"
+                },
+                "dataFrom": {
+                  "type": "array"
+                }
+              }
             }
           },
           "required": ["registry"],

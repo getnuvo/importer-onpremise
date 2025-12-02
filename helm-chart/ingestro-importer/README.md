@@ -75,6 +75,28 @@ Repeat for `mapping.externalSecret` or `aiService.externalSecret` if those secre
 
 > **Prerequisite:** enabling `*.externalSecret` assumes the [External Secrets Operator](https://external-secrets.io/latest/introduction/) CRDs are installed in your cluster and a `SecretStore`/`ClusterSecretStore` is configured to talk to AWS Secrets Manager or Parameter Store.
 
+#### Docker registry credentials via ExternalSecret
+
+Pods from every component reuse the same image pull secret. You can still provide credentials inline (set `global.imageCredentials.create=true` plus `username/password`) or precreate a secret and list it under `global.imagePullSecrets`. To mirror the behaviour of the workload secrets, the chart can now render an `ExternalSecret` that populates the Docker config:
+
+```yaml
+global:
+  imageCredentials:
+    externalSecret:
+      enabled: true
+      secretStoreRef:
+        name: aws-ssm
+        kind: ClusterSecretStore
+      target:
+        name: my-registry-pull-secret
+      data:
+        - secretKey: .dockerconfigjson
+          remoteRef:
+            key: /nuvo/docker
+```
+
+Make sure the upstream secret contains a valid `.dockerconfigjson` entry (base64-encoded JSON with your registry credentials). Every workload automatically references the resulting Kubernetes `Secret`, so no extra per-component wiring is required.
+
 ### Gateway and mapping ingress annotations and CORS
 
 Both ingress layers now expose optional CORS flags. Set `gateway.cors.enable` and/or `mappingGateway.cors.enable` to `true` if browsers call the `/sdk/v1`, `/sdk/service`, or `/sdk/mapping` endpoints directly.
