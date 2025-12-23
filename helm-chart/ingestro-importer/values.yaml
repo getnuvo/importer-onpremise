@@ -159,7 +159,7 @@ mapping:
 
   env:
     MAPPING_PORT: "3001" # Keep the default port
-    MAPPING_LLM_PROVIDER: AZURE # Replace with your LLM provider: AZURE or BEDROCK
+    MAPPING_LLM_PROVIDER: "" # Leave empty to disable; set to AZURE or BEDROCK to enable
     MAPPING_LLM_TEMPERATURE: "0.7" # Change this value to adjust the temperature of the LLM
 
   secrets:
