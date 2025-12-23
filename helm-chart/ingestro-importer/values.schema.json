@@ -164,22 +164,6 @@
             }
           }
         },
-        "env": {
-          "type": "object",
-          "properties": {
-            "MAPPING_PORT": {
-              "type": ["integer", "string"]
-            },
-            "MAPPING_LLM_PROVIDER": {
-              "type": "string",
-              "enum": ["", "AZURE", "BEDROCK"],
-              "default": ""
-            },
-            "MAPPING_LLM_TEMPERATURE": {
-              "type": ["number", "string"]
-            }
-          }
-        },
         "secretRef": {
           "type": "object",
           "properties": {
