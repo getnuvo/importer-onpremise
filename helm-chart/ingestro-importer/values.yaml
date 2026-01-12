@@ -159,7 +159,7 @@ mapping:
 
   env:
     MAPPING_PORT: "3001" # Keep the default port
-    MAPPING_LLM_PROVIDER: "" # Leave empty to disable; set to AZURE or BEDROCK to enable
+    MAPPING_LLM_PROVIDER: "" # Leave empty to disable; set to AZURE_OPENAI, AWS_BEDROCK, GCP_VERTEX, or OPENAI to enable
     MAPPING_LLM_TEMPERATURE: "0.7" # Change this value to adjust the temperature of the LLM
 
   secrets:
@@ -172,6 +172,12 @@ mapping:
     MAPPING_AZURE_OPENAI_API_VERSION: "" # Replace with your Azure OpenAI API version
     MAPPING_AZURE_OPENAI_DEPLOYMENT_NAME: "" # Replace with your Azure OpenAI deployment name
     MAPPING_AZURE_OPENAI_ENDPOINT: "" # Replace with your Azure OpenAI endpoint
+    MAPPING_GCP_VERTEX_CREDENTIALS_JSON: "" # Replace with your GCP service account JSON (within single quotation marks)
+    MAPPING_GCP_VERTEX_PROJECT_ID: "" # Replace with your GCP project ID
+    MAPPING_GCP_VERTEX_LOCATION: "" # Replace with your GCP Vertex location
+    MAPPING_GCP_VERTEX_MODEL_ID: "" # Replace with your GCP Vertex model ID
+    MAPPING_OPENAI_API_KEY: "" # Replace with your OpenAI API key
+    MAPPING_OPENAI_MODEL: "" # Replace with your OpenAI model
 
   secretRef:
     existingSecret: "" # Reference an existing Kubernetes Secret instead of creating one
