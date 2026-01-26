@@ -164,10 +164,10 @@ mapping:
 
   secrets:
     MAPPING_LICENSE_KEY: "" # Keep empty to use the global license key
-    MAPPING_AWS_BEDROCK_ACCESS_KEY_ID: "" # Replace with your AWS Bedrock access key ID
+    MAPPING_AWS_BEDROCK_ACCESS_KEY_ID: "" # Optional: leave empty to use IAM role auth for Bedrock
     MAPPING_AWS_BEDROCK_MODEL_ID: "" # Replace with your AWS Bedrock model ID
     MAPPING_AWS_BEDROCK_REGION: "" # Replace with your AWS Bedrock region
-    MAPPING_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Replace with your AWS Bedrock secret access key
+    MAPPING_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Optional: leave empty to use IAM role auth for Bedrock
     MAPPING_AZURE_OPENAI_API_KEY: "" # Replace with your Azure OpenAI API key
     MAPPING_AZURE_OPENAI_API_VERSION: "" # Replace with your Azure OpenAI API version
     MAPPING_AZURE_OPENAI_DEPLOYMENT_NAME: "" # Replace with your Azure OpenAI deployment name
@@ -266,30 +266,30 @@ aiService:
 
   secrets:
     SERVICE_LICENSE_KEY: "" # Keep empty to use the global license key
-    CLEANING_ASSISTANT_AWS_BEDROCK_ACCESS_KEY_ID: "" # Replace with your AWS Bedrock access key ID
+    CLEANING_ASSISTANT_AWS_BEDROCK_ACCESS_KEY_ID: "" # Optional: leave empty to use IAM role auth for Bedrock
     CLEANING_ASSISTANT_AWS_BEDROCK_MODEL_ID: "" # Replace with your AWS Bedrock model ID
     CLEANING_ASSISTANT_AWS_BEDROCK_REGION: "" # Replace with your AWS Bedrock region
-    CLEANING_ASSISTANT_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Replace with your AWS Bedrock secret access key
+    CLEANING_ASSISTANT_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Optional: leave empty to use IAM role auth for Bedrock
     CLEANING_ASSISTANT_AZURE_OPENAI_API_KEY: "" # Replace with your Azure OpenAI API key
     CLEANING_ASSISTANT_AZURE_OPENAI_API_VERSION: "" # Replace with your Azure OpenAI API version
     CLEANING_ASSISTANT_AZURE_OPENAI_DEPLOYMENT_NAME: "" # Replace with your Azure OpenAI deployment name
     CLEANING_ASSISTANT_AZURE_OPENAI_ENDPOINT: "" # Replace with your Azure OpenAI endpoint
     CLEANING_ASSISTANT_LLM_PROVIDER: BEDROCK # Replace with your LLM provider: AZURE or BEDROCK
     CLEANING_ASSISTANT_TEMPERATURE: "0.7" # Change this value to adjust the temperature of the LLM
-    CONTEXTUAL_ENGINE_AWS_BEDROCK_ACCESS_KEY_ID: "" # Replace with your AWS Bedrock access key ID
+    CONTEXTUAL_ENGINE_AWS_BEDROCK_ACCESS_KEY_ID: "" # Optional: leave empty to use IAM role auth for Bedrock
     CONTEXTUAL_ENGINE_AWS_BEDROCK_MODEL_ID: "" # Replace with your AWS Bedrock model ID
     CONTEXTUAL_ENGINE_AWS_BEDROCK_REGION: "" # Replace with your AWS Bedrock region
-    CONTEXTUAL_ENGINE_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Replace with your AWS Bedrock secret access key
+    CONTEXTUAL_ENGINE_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Optional: leave empty to use IAM role auth for Bedrock
     CONTEXTUAL_ENGINE_AZURE_OPENAI_API_KEY: "" # Replace with your Azure OpenAI API key
     CONTEXTUAL_ENGINE_AZURE_OPENAI_API_VERSION: "" # Replace with your Azure OpenAI API version
     CONTEXTUAL_ENGINE_AZURE_OPENAI_DEPLOYMENT_NAME: "" # Replace with your Azure OpenAI deployment name
     CONTEXTUAL_ENGINE_AZURE_OPENAI_ENDPOINT: "" # Replace with your Azure OpenAI endpoint
     CONTEXTUAL_ENGINE_LLM_PROVIDER: BEDROCK # Replace with your LLM provider: AZURE or BEDROCK
     CONTEXTUAL_ENGINE_TEMPERATURE: "0.7" # Change this value to adjust the temperature of the LLM
-    TEXT_TO_JS_AWS_BEDROCK_ACCESS_KEY_ID: "" # Replace with your AWS Bedrock access key ID
+    TEXT_TO_JS_AWS_BEDROCK_ACCESS_KEY_ID: "" # Optional: leave empty to use IAM role auth for Bedrock
     TEXT_TO_JS_AWS_BEDROCK_MODEL_ID: "" # Replace with your AWS Bedrock model ID
     TEXT_TO_JS_AWS_BEDROCK_REGION: "" # Replace with your AWS Bedrock region
-    TEXT_TO_JS_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Replace with your AWS Bedrock secret access key
+    TEXT_TO_JS_AWS_BEDROCK_SECRET_ACCESS_KEY: "" # Optional: leave empty to use IAM role auth for Bedrock
     TEXT_TO_JS_AZURE_OPENAI_API_KEY: "" # Replace with your Azure OpenAI API key
     TEXT_TO_JS_AZURE_OPENAI_API_VERSION: "" # Replace with your Azure OpenAI API version
     TEXT_TO_JS_AZURE_OPENAI_DEPLOYMENT_NAME: "" # Replace with your Azure OpenAI deployment name
