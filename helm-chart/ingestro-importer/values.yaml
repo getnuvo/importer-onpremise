@@ -140,7 +140,7 @@ mapping:
 
   image:
     repository: getnuvo/mapping
-    tag: 1.1.3 # Always check the latest tag in the repository
+    tag: 1.1.5 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
@@ -244,7 +244,7 @@ aiService:
 
   image:
     repository: getnuvo/service
-    tag: 0.0.1 # Always check the latest tag in the repository
+    tag: 0.0.2 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
