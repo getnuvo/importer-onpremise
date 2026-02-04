@@ -43,7 +43,7 @@ importer:
 
   image:
     repository: getnuvo/importer
-    tag: 1.2.1 # Always check the latest tag in the repository
+    tag: 1.3.0 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
@@ -244,7 +244,7 @@ aiService:
 
   image:
     repository: getnuvo/service
-    tag: 0.0.2 # Always check the latest tag in the repository
+    tag: 0.0.3 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:

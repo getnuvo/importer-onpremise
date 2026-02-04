@@ -71,7 +71,7 @@ services:
 
   importer-module:
     container_name: importer-module
-    image: getnuvo/importer:latest
+    image: getnuvo/importer:1.3.0
     ports:
       - "3000:3000"
     env_file:
@@ -84,7 +84,7 @@ services:
 
   mapping-module:
     container_name: mapping-module
-    image: getnuvo/mapping:latest
+    image: getnuvo/mapping:1.1.5
     env_file:
       - ./mapping-module.docker.env
     ports:
@@ -94,7 +94,7 @@ services:
 
   service:
     container_name: ai-service
-    image: getnuvo/service:latest
+    image: getnuvo/service:0.0.3
     env_file:
       - ./service-module.docker.env
     ports:
@@ -109,7 +109,7 @@ services:
 
   mongo:
     container_name: nuvo-database
-    image: mongo:latest
+    image: mongo:7.0
     volumes:
       - ./db_backup:/data/db
     ports:
