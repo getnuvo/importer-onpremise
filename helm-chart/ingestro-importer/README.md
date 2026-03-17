@@ -14,7 +14,7 @@ This chart deploys the complete Ingestro Importer backend (Importer API, Mapping
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Kubernetes 1.24+ cluster | EKS, AKS, GKE, OpenShift, Rancher, or any CNCF distribution                                                                                                            |
 | `kubectl` & Helm 3.9+    | `helm version`, `kubectl version` should succeed and point to the target cluster                                                                                       |
-| Docker Hub credentials   | username must be `getnuvo`, PAT with pull access to `getnuvo/*` images                                                                                                 |
+| Docker Hub credentials   | username must be `getnuvo`, PAT with pull access to `ingestro/*` images                                                                                                 |
 | Domain / DNS entry       | External traffic should land on the ingress controller; create a DNS record (e.g. `importer.customer.com`) pointing to the controller’s load balancer                  |
 | Ingress controller       | Most managed clusters ship an ingress solution. If not, install one (e.g. AWS Load Balancer Controller, nginx ingress, Traefik). Examples below use nginx for clarity. |
 

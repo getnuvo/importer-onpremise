@@ -42,8 +42,8 @@ importer:
   replicaCount: 1
 
   image:
-    repository: getnuvo/importer
-    tag: 1.3.0 # Always check the latest tag in the repository
+    repository: ingestro/importer
+    tag: 1.0.0 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
@@ -139,8 +139,8 @@ mapping:
   replicaCount: 1
 
   image:
-    repository: getnuvo/mapping
-    tag: 1.1.5 # Always check the latest tag in the repository
+    repository: ingestro/mapping
+    tag: 1.0.0 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
@@ -243,8 +243,8 @@ aiService:
   replicaCount: 1
 
   image:
-    repository: getnuvo/service
-    tag: 0.0.5 # Always check the latest tag in the repository
+    repository: ingestro/service
+    tag: 1.0.0 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:

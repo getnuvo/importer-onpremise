@@ -71,8 +71,8 @@ prepare_nuvo_images() {
 
     echo -e "${BOLD}Pulling nuvo images...${NC}"
 
-    docker pull getnuvo/importer:latest
-    docker pull getnuvo/mapping:latest
+    docker pull ingestro/importer:latest
+    docker pull ingestro/mapping:latest
 
     echo -e "${GREEN}Nuvo images pulled successfully!${NC}"
 }
