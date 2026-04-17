@@ -139,8 +139,8 @@ mapping:
   replicaCount: 1
 
   image:
-    repository: ingestro/mapping
-    tag: 1.0.0 # Always check the latest tag in the repository
+    repository: getnuvo/mapping
+    tag: 1.1.6 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
