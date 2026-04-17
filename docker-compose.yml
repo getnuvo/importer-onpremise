@@ -84,7 +84,7 @@ services:
 
   mapping-module:
     container_name: mapping-module
-    image: ingestro/mapping:1.0.0
+    image: getnuvo/mapping:1.1.6
     env_file:
       - ./mapping-module.docker.env
     ports:
