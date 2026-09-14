@@ -70,8 +70,9 @@ importer:
 
   secrets:
     IMPORTER_LICENSE_KEY: "" # Keep empty to use the global license key
-    IMPORTER_AWS_ACCESS_KEY: "" # Replace with your AWS access key
-    IMPORTER_AWS_SECRET_KEY: "" # Replace with your AWS secret key
+    # S3 bucket — required only for server-side option matching (processingMode: 'node'). Column matching works without these.
+    IMPORTER_AWS_ACCESS_KEY: "" # Replace with your AWS access key (omit when using IAM role)
+    IMPORTER_AWS_SECRET_KEY: "" # Replace with your AWS secret key (omit when using IAM role)
     IMPORTER_AWS_REGION: "" # Replace with your AWS region
     IMPORTER_AWS_S3_BUCKET: "" # Replace with your AWS S3 bucket name
 
