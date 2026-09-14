@@ -2,7 +2,7 @@
   <a href="https://ingestro.com/" rel="noopener" target="_blank"><img width="150" src="https://s3.eu-central-1.amazonaws.com/general-upload.ingestro.com/ingestro_logo_darkblue.svg" alt="Ingestro logo"></a>
 </p>
 
-# Ingestro-importer Helm Chart Guide
+# Ingestro Importer Helm Chart Guide
 
 This chart deploys the complete Ingestro Importer backend (Importer API, Mapping API, AI Service, MongoDB, ingress routing, and supporting secrets) into any Kubernetes cluster with a single `helm install`. It mirrors the production setup we ship to customers: probes, ingress rewrites, registry secrets, ConfigMap/Secret managed env vars, and optional autoscaling settings are already baked in.
 
@@ -34,13 +34,47 @@ Key points to consider:
 | `livenessProbe/readinessProbe`       | Adjust timings or disable in dev                | Align probes with your env                                                              |
 | `global.licenseKey`                  | Change with your Ingestro Pipelines License Key | Centralize license delivery. Set once to avoid setting it for each service individually |
 
+### Option mapping and S3 bucket (`importer.secrets`)
+
+You can deploy without an S3 bucket. Configure one under `importer.secrets` only if your target data model uses server-side option matching.
+
+| Feature | S3 bucket required? |
+| ------- | ------------------- |
+| Column matching (server-side) | No — headers and target columns are sent inline to the mapping module |
+| Option matching (browser-side, default) | No |
+| Option matching (server-side, `processingMode: 'node'`) | Yes — importer uploads sheet data, mapping module reads via presigned URL |
+
+Configure these under `importer.secrets` in your values override (or via `importer.externalSecret` / `importer.secretRef.existingSecret`):
+
+| Secret key | Purpose |
+| ---------- | ------- |
+| `IMPORTER_AWS_S3_BUCKET` | Bucket for temporary sheet uploads during server-side option matching |
+| `IMPORTER_AWS_REGION` | AWS region of the bucket |
+| `IMPORTER_AWS_ACCESS_KEY` | Access key (omit when the pod uses an IAM role) |
+| `IMPORTER_AWS_SECRET_KEY` | Secret key (omit when the pod uses an IAM role) |
+
+Example inline configuration:
+
+```yaml
+importer:
+  secrets:
+    IMPORTER_AWS_S3_BUCKET: my-importer-uploads
+    IMPORTER_AWS_REGION: eu-central-1
+    IMPORTER_AWS_ACCESS_KEY: "" # leave empty when using IAM role auth
+    IMPORTER_AWS_SECRET_KEY: ""
+```
+
+> **No bucket?** Column matching and browser-side option matching work without one. For Docker Compose deployments, `./scripts/configure.sh` offers the same bucket setup flow interactively.
+
+See also the root [README](../../README.md#option-mapping-and-s3-storage) for the full feature matrix.
+
 ### Secret handling (inline, existing, or ExternalSecret)
 
 Each workload (importer, mapping, aiService) supports three approaches:
 
 1. **Inline secrets** (default) via the `*.secrets` block (plus `global.licenseKey`). Helm renders an Opaque Secret in the namespace.
 2. **Reference a pre-created secret** by setting `*.secretRef.existingSecret`. Use this when another tool (e.g. AWS Secrets Manager + External Secrets Operator) already populates a Kubernetes `Secret`.
-3. **Ask the chart to create an ExternalSecret** by enabling `*.externalSecret`. This renders an [`ExternalSecret`](https://external-secrets.io/latest/introduction/) resource that syncs from your `SecretStore`/`ClusterSecretStore` into the same secret that pods consume.
+3. **Ask the chart to create an ExternalSecret** by enabling `*.externalSecret`. This renders an [`ExternalSecret`](https://external-secrets.io/latest/introduction/getting-started/) resource that syncs from your `SecretStore`/`ClusterSecretStore` into the same secret that pods consume.
 
 Example: sourcing importer credentials from AWS Secrets Manager via External Secrets Operator:
 
@@ -73,7 +107,7 @@ importer:
 
 Repeat for `mapping.externalSecret` or `aiService.externalSecret` if those secrets live in AWS as well. If you already create ExternalSecrets outside this chart, leave `externalSecret.enabled=false` and set `secretRef.existingSecret` to the name of the resulting Kubernetes `Secret`.
 
-> **Prerequisite:** enabling `*.externalSecret` assumes the [External Secrets Operator](https://external-secrets.io/latest/introduction/) CRDs are installed in your cluster and a `SecretStore`/`ClusterSecretStore` is configured to talk to AWS Secrets Manager or Parameter Store.
+> **Prerequisite:** enabling `*.externalSecret` assumes the [External Secrets Operator](https://external-secrets.io/latest/introduction/getting-started/) CRDs are installed in your cluster and a `SecretStore`/`ClusterSecretStore` is configured to talk to AWS Secrets Manager or Parameter Store.
 
 #### Docker registry credentials via ExternalSecret
 
