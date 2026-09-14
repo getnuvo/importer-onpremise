@@ -1,0 +1,43 @@
+helm-chart/ingestro-importer/values.yaml
+  h_8b2cd6a3e3b1c5 73
+  s_17832be3b9a042::t_c532b5ceeeeafa 74-75
+helm-chart/ingestro-importer/README.md
+  s_17832be3b9a042::t_5551df15e6bc5f 38,40-42,46-50,52-66,68,70
+  h_8b2cd6a3e3b1c5 5,37,39
+  s_17832be3b9a042::t_2f0ae7f5e76dca 69
+  s_17832be3b9a042::t_7fd470d3005f48 77
+  s_17832be3b9a042::t_1dcaa58bdbaee6 110
+  s_17832be3b9a042::t_d6793bb21eb1bc 43-45,51,67
+README.md
+  h_8b2cd6a3e3b1c5 95,120,135,152,165
+  s_17832be3b9a042::t_7553533569ac0f 121,123-127,130-134,136-142,144,146-147,149,151,153
+  s_17832be3b9a042::t_0a349c5b0d3478 122,128-129,143,145
+  s_17832be3b9a042::t_934f9695d38aa6 148
+  s_17832be3b9a042::t_083ef056569a27 150
+  s_17832be3b9a042::t_c2802160886e6c 10
+  s_17832be3b9a042::t_9264b5179544f4 154
+  h_8b2cd6a3e3b1c5 13,22,29,81,87,105,163
+example.importer-module.docker.env
+  h_8b2cd6a3e3b1c5 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b3a03a73a89f3d1050ef6a5891893e3be9d061b1",
+  "prompts": {},
+  "humans": {
+    "h_8b2cd6a3e3b1c5": {
+      "author": "benhrtg <ben@comdocks.com>"
+    }
+  },
+  "sessions": {
+    "s_17832be3b9a042": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5e851d1e-5c66-4d8b-858b-83b6c900a078",
+        "model": "composer-2.5"
+      },
+      "human_author": "benhrtg <ben@comdocks.com>"
+    }
+  }
+}
