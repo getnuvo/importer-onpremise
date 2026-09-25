@@ -1,0 +1,14 @@
+helm-chart/ingestro-importer/values.yaml
+  h_8defef620c14fb 46,255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "b35354eab06ec40e61d35bf485f0c2c12956932c",
+  "prompts": {},
+  "humans": {
+    "h_8defef620c14fb": {
+      "author": "Nattapong Harnkwang <wimkung@gmail.com>"
+    }
+  }
+}
