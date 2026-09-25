@@ -141,7 +141,7 @@ mapping:
 
   image:
     repository: ingestro/mapping
-    tag: 1.1.9 # Always check the latest tag in the repository
+    tag: 1.1.10 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
