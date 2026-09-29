@@ -1,0 +1,23 @@
+.github/scripts/bump-image-tag.py
+  s_7d205f9c27c6f6::t_746417f48582b7 1-128
+.github/workflows/bump-image-tag.yml
+  s_7d205f9c27c6f6::t_71b876c821c9cd 99-100,102
+  s_7d205f9c27c6f6::t_9d061bfda3e876 96
+  s_7d205f9c27c6f6::t_0a67753273f8f3 1-95,97-98,101,103-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "2eaaa16386c8fa7f59bbd88945cc98d043869cd6",
+  "prompts": {},
+  "sessions": {
+    "s_7d205f9c27c6f6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "95696585-c9b3-4487-892c-38f90b7ff471",
+        "model": "auto-smart"
+      },
+      "human_author": "Nattapong Harnkwang <wimkung@gmail.com>"
+    }
+  }
+}
