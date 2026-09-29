@@ -1,0 +1,80 @@
+# Opens a PR that bumps one Helm image tag.
+# Re-run: Actions → Bump Helm image tag → Run workflow (component + tag).
+# Dispatch token needs Contents: write on this repo (GH_DEPLOYER_TOKEN from the image repo).
+
+name: Bump Helm image tag
+
+on:
+  repository_dispatch:
+    types: [bump-image-tag]
+  workflow_dispatch:
+    inputs:
+      component:
+        description: Chart component
+        required: true
+        type: choice
+        options:
+          - aiService
+          - importer
+          - mapping
+      tag:
+        description: Semver image tag, for example 1.3.1
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: bump-image-tag-${{ github.event.client_payload.component || inputs.component || 'unknown' }}
+  cancel-in-progress: true
+
+env:
+  COMPONENT: ${{ github.event.client_payload.component || inputs.component }}
+  TAG: ${{ github.event.client_payload.tag || inputs.tag }}
+  IMAGE: ${{ github.event.client_payload.image || 'n/a' }}
+  SOURCE: ${{ github.event.client_payload.source || 'workflow_dispatch' }}
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Bump tag
+        id: bump
+        run: |
+          python3 .github/scripts/bump-image-tag.py \
+            helm-chart/ingestro-importer/values.yaml \
+            "$COMPONENT" \
+            "$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OLD: ${{ steps.bump.outputs.old }}
+        run: |
+          set -euo pipefail
+          branch="chore/bump-${COMPONENT}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add helm-chart/ingestro-importer/values.yaml
+          git commit -m "chore(values): bump ${COMPONENT} image to ${TAG}"
+          if ! git push origin "HEAD:${branch}"; then
+            git fetch origin "${branch}"
+            git push --force-with-lease="refs/heads/${branch}:refs/remotes/origin/${branch}" origin "HEAD:${branch}"
+          fi
+          title="chore(values): bump ${COMPONENT} image to ${TAG}"
+          body=$(printf 'Bumps `%s.image.tag` from `%s` to `%s`.\n\n- Image: `%s`\n- Source: `%s`\n' \
+            "$COMPONENT" "$OLD" "$TAG" "$IMAGE" "$SOURCE")
+          open_pr=$(gh pr list --head "$branch" --state open --json number -q '.[0].number')
+          if [ -n "$open_pr" ]; then
+            gh pr edit "$open_pr" --title "$title" --body "$body"
+          else
+            gh pr create --head "$branch" --title "$title" --body "$body"
+          fi
