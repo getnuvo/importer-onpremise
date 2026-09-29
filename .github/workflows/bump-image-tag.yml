@@ -1,6 +1,6 @@
 # Opens a PR that bumps one Helm image tag.
 # Re-run: Actions → Bump Helm image tag → Run workflow (component + tag).
-# Dispatch token needs Actions: write on this repo (GH_DEPLOYER_TOKEN from the image repo).
+# Dispatch token needs Contents: write on this repo (GH_DEPLOYER_TOKEN from the image repo).
 
 name: Bump Helm image tag
 
@@ -30,61 +30,35 @@ concurrency:
   group: bump-image-tag-${{ github.event.client_payload.component || inputs.component || 'unknown' }}
   cancel-in-progress: true
 
+env:
+  COMPONENT: ${{ github.event.client_payload.component || inputs.component }}
+  TAG: ${{ github.event.client_payload.tag || inputs.tag }}
+  IMAGE: ${{ github.event.client_payload.image || 'n/a' }}
+  SOURCE: ${{ github.event.client_payload.source || 'workflow_dispatch' }}
+
 jobs:
   bump:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Bump tag
         id: bump
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          INPUT_COMPONENT: ${{ inputs.component }}
-          INPUT_TAG: ${{ inputs.tag }}
-          PAYLOAD_COMPONENT: ${{ github.event.client_payload.component }}
-          PAYLOAD_TAG: ${{ github.event.client_payload.tag }}
-          PAYLOAD_IMAGE: ${{ github.event.client_payload.image }}
-          PAYLOAD_SOURCE: ${{ github.event.client_payload.source }}
         run: |
-          set -euo pipefail
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            component="$INPUT_COMPONENT"
-            tag="$INPUT_TAG"
-            image=""
-            source="workflow_dispatch"
-          else
-            component="$PAYLOAD_COMPONENT"
-            tag="$PAYLOAD_TAG"
-            image="$PAYLOAD_IMAGE"
-            source="$PAYLOAD_SOURCE"
-          fi
           python3 .github/scripts/bump-image-tag.py \
             helm-chart/ingestro-importer/values.yaml \
-            "$component" \
-            "$tag" >> "$GITHUB_OUTPUT"
-          {
-            echo "component=${component}"
-            echo "tag=${tag}"
-            echo "image=${image}"
-            echo "source=${source}"
-          } >> "$GITHUB_OUTPUT"
+            "$COMPONENT" \
+            "$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Open pull request
         if: steps.bump.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          COMPONENT: ${{ steps.bump.outputs.component }}
-          TAG: ${{ steps.bump.outputs.tag }}
           OLD: ${{ steps.bump.outputs.old }}
-          IMAGE: ${{ steps.bump.outputs.image }}
-          SOURCE: ${{ steps.bump.outputs.source }}
         run: |
           set -euo pipefail
-          case "$COMPONENT" in
-            aiService|importer|mapping) ;;
-            *) echo "refusing branch for component" >&2; exit 1 ;;
-          esac
           branch="chore/bump-${COMPONENT}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -96,12 +70,11 @@ jobs:
             git push --force-with-lease="refs/heads/${branch}:refs/remotes/origin/${branch}" origin "HEAD:${branch}"
           fi
           title="chore(values): bump ${COMPONENT} image to ${TAG}"
-          image="${IMAGE:-n/a}"
-          source="${SOURCE:-workflow_dispatch}"
           body=$(printf 'Bumps `%s.image.tag` from `%s` to `%s`.\n\n- Image: `%s`\n- Source: `%s`\n' \
-            "$COMPONENT" "$OLD" "$TAG" "$image" "$source")
-          if gh pr view "$branch" >/dev/null 2>&1; then
-            gh pr edit "$branch" --title "$title" --body "$body"
+            "$COMPONENT" "$OLD" "$TAG" "$IMAGE" "$SOURCE")
+          open_pr=$(gh pr list --head "$branch" --state open --json number -q '.[0].number')
+          if [ -n "$open_pr" ]; then
+            gh pr edit "$open_pr" --title "$title" --body "$body"
           else
             gh pr create --head "$branch" --title "$title" --body "$body"
           fi

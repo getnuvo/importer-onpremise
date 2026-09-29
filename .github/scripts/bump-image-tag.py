@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 COMPONENTS = ("aiService", "importer", "mapping")
-TAG_RE = re.compile(r"^\d+\.\d+\.\d+$")
+TAG_RE = re.compile(r"^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$")
 
 
 def bump_text(text: str, component: str, tag: str) -> tuple[str, str, bool]:
@@ -89,7 +89,7 @@ mongo:
     ):
         bumped, _, did = bump_text(fixture, component, new_tag)
         assert did and needle in bumped and "tag: 1.3.0 # keep" in bumped
-    for bad in ("latest", "20457-staging", "1.2", "v1.2.3", ""):
+    for bad in ("latest", "20457-staging", "1.2", "v1.2.3", "", "01.2.3", "1.\u0662.3", "1.2.3\nchanged=false"):
         try:
             bump_text(fixture, "aiService", bad)
         except ValueError:
