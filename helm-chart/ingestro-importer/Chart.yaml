@@ -2,7 +2,7 @@ apiVersion: v2
 name: ingestro-importer
 description: Helm chart that deploys the Ingestro Importer, Mapping, AI service, and MongoDB stack.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "1.0.0"
 home: https://ingestro.com
 sources:
