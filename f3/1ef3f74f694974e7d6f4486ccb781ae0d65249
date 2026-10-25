@@ -1,0 +1,23 @@
+helm-chart/ingestro-importer/Chart.yaml
+  s_f0c095243aa119::t_1ad28ebe32739f 5
+helm-chart/ingestro-importer/README.md
+  s_f0c095243aa119::t_acae6a028194ee 17
+helm-chart/ingestro-importer/values.yaml
+  s_f0c095243aa119::t_342db6f0817934 46,143-144,255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "f31ef3f74f694974e7d6f4486ccb781ae0d65249",
+  "prompts": {},
+  "sessions": {
+    "s_f0c095243aa119": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "094cc4e8-754c-4887-8fa9-7eec0739da77",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Nattapong Harnkwang <wimkung@gmail.com>"
+    }
+  }
+}
