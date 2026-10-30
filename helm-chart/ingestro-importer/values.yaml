@@ -43,7 +43,7 @@ importer:
 
   image:
     repository: ingestro/importer
-    tag: 1.6.0 # Always check the latest tag in the repository
+    tag: 1.7.0 # Always check the latest tag in the repository
     pullPolicy: IfNotPresent
 
   serviceAccount:
