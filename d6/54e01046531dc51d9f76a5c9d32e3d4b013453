@@ -1,0 +1,21 @@
+helm-chart/ingestro-importer/values.yaml
+  s_76e427e3691ea1::t_51a808b4392788 462-466
+scripts/configure.sh
+  s_76e427e3691ea1::t_d1447160d6f5a0 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d654e01046531dc51d9f76a5c9d32e3d4b013453",
+  "prompts": {},
+  "sessions": {
+    "s_76e427e3691ea1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9f8fc859-bc41-4e34-9d07-1be5817bc990",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Nattapong Harnkwang <wimkung@gmail.com>"
+    }
+  }
+}
