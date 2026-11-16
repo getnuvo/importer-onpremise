@@ -459,6 +459,11 @@ gateway:
           service:
             name: importer
             port: http
+        - path: /sdk/v2
+          pathType: Prefix
+          service:
+            name: importer
+            port: http
         - path: /sdk/service
           pathType: Prefix
           service:

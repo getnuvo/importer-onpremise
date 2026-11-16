@@ -24,6 +24,7 @@ curl -i -X POST --url http://localhost:8001/services/ \
 curl -i -X POST --url http://localhost:8001/services/importer-service/routes \
   --data 'name=importer-route' \
   --data 'paths[]=/sdk/v1' \
+  --data 'paths[]=/sdk/v2' \
   --data 'strip_path=false'
 
 # create mapping-service
